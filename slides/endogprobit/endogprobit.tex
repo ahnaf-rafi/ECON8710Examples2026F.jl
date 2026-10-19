@@ -1,0 +1,227 @@
+\documentclass[aspectratio=169, 10pt, handout]{beamer}
+
+%%%%%%%%%%%%%%%%%%%
+% Beamer settings %
+%%%%%%%%%%%%%%%%%%%
+\usefonttheme{serif}
+\setbeamertemplate{footline}[frame number]{}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{items}[circle]
+\setbeamertemplate{section in toc}[sections numbered]
+\setbeamertemplate{frametitle continuation}{}
+\setbeamertemplate{caption}[numbered]
+\setbeamertemplate{section in toc shaded}[default][100]
+\setbeamertemplate{enumerate items}[default]
+\setbeamerfont{section in toc shaded}{series=\mdseries}
+\setbeamerfont{section in toc}{series=\bfseries}
+
+%%%%%%%%%%
+% Images %
+%%%%%%%%%%
+\usepackage{graphicx}
+
+%%%%%%%%%%
+% Tables %
+%%%%%%%%%%
+\usepackage{booktabs}
+\usepackage{multirow}
+
+%%%%%%%%%%%%%%%%%%
+% Math: Pacakges %
+%%%%%%%%%%%%%%%%%%
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{bm}
+\usepackage{mathrsfs}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Math: Theorem Environments %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\setbeamertemplate{theorems}[numbered]
+
+\theoremstyle{definition}
+\newtheorem{defn}{Definition}
+\newtheorem*{defn*}{Definition}
+\newtheorem{asm}{Assumption}
+\newtheorem*{asm*}{Assumption}
+
+\theoremstyle{plain}
+\newtheorem{thm}{Theorem}
+\newtheorem{lem}{Theorem}
+\newtheorem{cor}{Corollary}
+\newtheorem*{thm*}{Theorem}
+\newtheorem*{lem*}{Lemma}
+\newtheorem*{cor*}{Corollary}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Math: Operators and Symbols %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Does not imply
+% Source - https://tex.stackexchange.com/a/509385
+% Posted by jds
+% Retrieved 2026-03-30, License - CC BY-SA 4.0
+\newcommand{\notimplies}{\;\not\mspace{-12mu}\implies}
+
+% Independence in Probability Theory and Statistics.
+\newcommand{\indep}{\mathrel{\perp\mspace{-11mu}\perp}}
+
+% Indicators
+\def\ind{\mathbf{1}}
+
+\DeclareMathOperator*{\argmax}{argmax}
+
+% Probability operators
+\def\Pr{\mathrm{Pr}}
+\def\E{\mathrm{E}}
+\def\Var{\mathrm{Var}}
+\def\Cov{\mathrm{Cov}}
+\def\Supp{\mathrm{support}}
+\def\pto{\overset{\mathrm{p}}{\to}}
+\def\dto{\rightsquigarrow}
+\def\Normal{\mathrm{N}} % Normal distribution
+\def\Unif{\mathrm{Unif}} % Normal distribution
+
+\def\Op{O_{\mathrm{p}}}
+\def\op{o_{\mathrm{p}}}
+
+% IID
+\def\iid{\mathrm{iid}}
+
+\def\sgn{\mathrm{sgn}}
+
+\def\bfQ{\mathbf{Q}}
+\def\R{\mathbb{R}}
+\def\N{\mathbb{N}}
+\def\bW{\mathbf{W}}
+\def\bY{\mathbf{Y}}
+\def\bA{\mathbf{A}}
+\def\bZ{\mathbf{Z}}
+\def\bX{\mathbf{X}}
+\def\bU{\mathbf{U}}
+\def\calA{\mathcal{A}}
+\def\calS{\mathcal{S}}
+\def\calZ{\mathcal{Z}}
+\def\calY{\mathcal{Y}}
+\def\calW{\mathcal{W}}
+\def\calQ{\mathcal{Q}}
+\def\d{\mathrm{d}}
+\def\sphere{\mathbb{S}}
+
+\newcommand\mapsfrom{\mathrel{\reflectbox{\ensuremath{\mapsto}}}}
+
+% \usepackage[
+% authordate,backend=biber,natbib,maxcitenames=2
+% ]{biblatex-chicago}
+
+% \addbibresource{../main.bib}
+
+\makeatletter
+\renewcommand<>\appendix{%
+\setcounter{section}{0}%
+\renewcommand\insertsectionnumber{\Alph{section}}%
+  \only#1{\part{\appendixname}
+  \addtocontents{nav}{\protect\headcommand{\protect\beamer@appendixpages{\the\c@page}}}}}
+\makeatother
+
+\providecommand{\mainframetotal}{?}
+\providecommand{\appendixframetotal}{?}
+\newif\ifappendixstarted
+
+\setbeamertemplate{footline}{%
+  \hfill
+  \usebeamerfont{page number in head/foot}%
+  \usebeamercolor[fg]{page number in head/foot}%
+  \insertframenumber/\mainframetotal\kern1em\vskip2pt%
+}
+
+\makeatletter
+\AddToHook{cmd/appendix/before}{%
+  \immediate\write\@auxout{%
+    \string\gdef\string\mainframetotal{\arabic{framenumber}}%
+  }%
+}
+
+\AddToHook{cmd/appendix/after}{%
+  \global\appendixstartedtrue
+  \setcounter{framenumber}{0}%
+  \setbeamertemplate{footline}{%
+    \hfill
+    \usebeamerfont{page number in head/foot}%
+    \usebeamercolor[fg]{page number in head/foot}%
+    A\insertframenumber/A\appendixframetotal\kern1em\vskip2pt%
+  }%
+}
+
+\AtEndDocument{%
+  \ifappendixstarted
+    \immediate\write\@auxout{%
+      \string\gdef\string\appendixframetotal{\arabic{framenumber}}%
+    }%
+  \else
+    \immediate\write\@auxout{%
+      \string\gdef\string\mainframetotal{\arabic{framenumber}}%
+    }%
+  \fi
+}
+\makeatother
+
+
+\title{A probit model with a continuous endogenous regressor}
+\author{Ahnaf Rafi}
+\date{\today \\
+ECON 8710: Cross Section Econometrics \\
+University of Virginia, Fall 2026
+}
+\begin{document}
+
+\begin{frame}[plain,noframenumbering]
+\titlepage
+\end{frame}
+
+\section*{Introduction}
+
+\begin{frame}{Observables and the structural model}
+We observe an i.i.d.\ sample of \(\xi = (Y, D, X', Z')'\).
+\(Y \in \{0, 1\}\) is the binary outcome,
+\(D \in \R\) is a continuous \textbf{endogenous} covariate,
+\(X \in \R^{k}\) are exogenous covariates,
+\(Z \in \R^{l}\) are excluded instruments, with \(l \geq 1\).
+For unobserved \(\epsilon\) and \(\nu\), model is
+\begin{equation*}
+  \begin{split}
+    Y =
+    & \, \ind \{\alpha_{0} D + X' \beta_{0} - \epsilon \geq 0\}, \\
+    D =
+    & \, X' \gamma_{0} + Z' \pi_{0} + \nu = S' \delta_{0} + \nu, \quad
+    S = (X', Z')', \quad \delta_{0} = (\gamma_{0}', \pi_{0}')'.
+  \end{split}
+\end{equation*}
+Assume \(\pi \neq \mathbf{0}_{l}\) (rank condition), \(\E [S S']\) is finite and
+positive definite, \((\epsilon, \nu) \indep S\) and
+\begin{equation*}
+  \begin{pmatrix} \epsilon \\ \nu \end{pmatrix}
+  \sim \Normal \left(\begin{pmatrix} 0 \\ 0 \end{pmatrix},
+  C_{0} C_{0}'\right), \quad
+  C_{0} =
+  \begin{pmatrix}
+    1 & 0 \\
+    \rho_{0} & e^{\tau_{0}}
+  \end{pmatrix}.
+\end{equation*}
+\vfill
+\begin{itemize}
+  \item With this parametrization, \(\rho_{0}, \tau_{0}\) always produce a
+    lower triangular Cholesky decomposition of a \(2 \times 2\) covariance
+    matrix.
+    \vfill
+  \item When \(\rho_{0} \neq 0\), \(D\) is endogenous since it correlates with
+    \(\varepsilon\).
+    \vfill
+  \item The full vector of unknown parameters is \(\vartheta_{0} = (\alpha_{0},
+    \beta_{0}', \gamma_{0}', \pi_{0}', \rho_{0}, \tau_{0})\).
+\end{itemize}
+\end{frame}
+
+\end{document}
