@@ -31,7 +31,7 @@ for j in 1:dS
         ΣU0[i,j] = ifelse(j != i, ρ0S, 1.0)
     end
 end
-ΣU0[dS + 1, dS + 1] = σ02
+ΣU0[dS + 1, dS + 1] = τ0
 ΣU0[dS + 1, dξ] = ρ0
 ΣU0[dξ, dS + 1] = ρ0
 ΣU0[dξ, dξ] = 1.0
@@ -42,5 +42,5 @@ CU0 = cholesky(ΣU0).L
 dϑ = length(ϑ0)
 θ0 = [β0; α0]
 dθ = length(θ0)
-η0 = [γ0; π0; σ02]
+η0 = [γ0; π0; τ0]
 dη = length(η0)
