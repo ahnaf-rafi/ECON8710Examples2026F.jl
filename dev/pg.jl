@@ -24,7 +24,8 @@ dξ = dS + 2
 ρ0 = 0.5 # Correlation
 ρ0S = 0.1
 
-# Generate a matrix of zeros to be filled.
+# Generate a matrix of zeros to be filled with entries of covariance matrix of
+# U = (X', Z', ν, ϵ)'.
 ΣU0 = zeros(dξ, dξ)
 for j in 1:dS
     for i in 1:dS
