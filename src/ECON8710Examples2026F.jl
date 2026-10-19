@@ -22,6 +22,7 @@ include("utilities/rng/mix64.jl")
 # Probit model with single endogenous regressor #
 #-----------------------------------------------#
 include("endogprobit/types.jl")
-include("endogprobit/simhelpers/mk_rng.jl")
+include("endogprobit/simhelpers/mkrng.jl")
+include("endogprobit/simulation/gen.jl")
 
 end

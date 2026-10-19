@@ -1,5 +1,6 @@
 # Placeholder struct to help mk_rng distinguish use case.
 struct EndogProbitSimRng end
+export EndogProbitSimRng
 
 """
     mk_rng(::EndogProbitSimRng, mseed::Int, n::Int, r::Int, b::Int) -> Xoshiro
