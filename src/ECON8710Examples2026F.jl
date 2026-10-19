@@ -16,7 +16,16 @@ const SQRT2PI_INV = sqrt(2 / π)
 #--------------------#
 include("utilities/general/logging.jl")
 include("utilities/general/outfilenamer.jl")
+
 include("utilities/rng/mix64.jl")
+
+include("utilities/weights/base-obswgt.jl")
+include("utilities/weights/exp.jl")
+include("utilities/weights/gauss.jl")
+include("utilities/weights/mixunif.jl")
+include("utilities/weights/multinom.jl")
+include("utilities/weights/poisson.jl")
+include("utilities/weights/symunif.jl")
 
 #-----------------------------------------------#
 # Probit model with single endogenous regressor #
