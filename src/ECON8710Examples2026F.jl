@@ -15,6 +15,7 @@ const SQRT2PI_INV = sqrt(2 / π)
 # Utilities: general #
 #--------------------#
 include("utilities/general/logging.jl")
+include("utilities/general/outfilenamer.jl")
 include("utilities/rng/mxi64.jl")
 
 #-----------------------------------------------#
