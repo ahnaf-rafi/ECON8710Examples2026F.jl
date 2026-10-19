@@ -17,5 +17,10 @@ const SQRT2PI_INV = sqrt(2 / π)
 include("utilities/general/logging.jl")
 include("utilities/rng/mxi64.jl")
 
+#-----------------------------------------------#
+# Probit model with single endogenous regressor #
+#-----------------------------------------------#
+include("endogprobit/types.jl")
+include("endogprobit/simhelpers/mk_rng.jl")
 
 end
