@@ -19,6 +19,7 @@ include("utilities/general/outfilenamer.jl")
 
 include("utilities/rng/mix64.jl")
 
+export wgts!
 include("utilities/weights/base-obswgt.jl")
 include("utilities/weights/exp.jl")
 include("utilities/weights/gauss.jl")
