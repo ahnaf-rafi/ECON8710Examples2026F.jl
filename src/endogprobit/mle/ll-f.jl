@@ -78,7 +78,7 @@ function ll(ϑ, data::EndogProbitData, wgts=nothing)
 
         # Calculate first stage residual
         νi = Di - Xγi - Zπi
-        # Calculation evaluation point for standard normal cdf for part of
+        # Calculate evaluation point for standard normal cdf for part of
         # likelihood associated with Y.
         cdfx = Yi * cdfxdenom * (Xβi + (α * Di) - (ρinvσ * νi))
         # Add likelihood increment.
