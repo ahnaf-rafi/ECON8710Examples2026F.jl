@@ -21,18 +21,18 @@ include("utilities/rng/mix64.jl")
 
 export wgts!
 include("utilities/weights/base-obswgt.jl")
-include("utilities/weights/exp.jl")
-include("utilities/weights/gauss.jl")
-include("utilities/weights/mixunif.jl")
 include("utilities/weights/multinom.jl")
 include("utilities/weights/poisson.jl")
-include("utilities/weights/symunif.jl")
+include("utilities/weights/unifmix.jl")
+include("utilities/weights/unifsym.jl")
+include("utilities/weights/exp.jl")
+include("utilities/weights/gauss.jl")
 
 #-----------------------------------------------#
 # Probit model with single endogenous regressor #
 #-----------------------------------------------#
 include("endogprobit/types.jl")
-include("endogprobit/simhelpers/mkrng.jl")
+include("endogprobit/simulation/mkrng.jl")
 include("endogprobit/simulation/gen.jl")
 
 end
