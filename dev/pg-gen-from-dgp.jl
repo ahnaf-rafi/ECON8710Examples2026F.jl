@@ -44,7 +44,7 @@ end
 CU0 = cholesky(ΣU0).L
 
 # Various parameter vectors.
-ϑ0 = [β0; γ0; π0; α0; ρ0; τ0]  # Fundamental structural parameter.
+ϑ0 = [β0; γ0; π0; α0; τ0; ρ0]  # Fundamental structural parameter.
 dϑ = length(ϑ0)                # Fundamental structural parameter: length.
 θ0 = [β0; α0]                  # Second stage parameter.
 dθ = length(θ0)                # Second stage parameter: length.
