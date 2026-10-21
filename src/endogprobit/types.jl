@@ -33,9 +33,11 @@ Pass `cholesky(Σ).L` as `CU0`.
 struct EndogProbitGaussianDGP <: EndogProbitDGP
     α0  :: Float64
     β0  :: Vector{Float64}
-    π0  :: Vector{Float64}
     γ0  :: Vector{Float64}
+    π0  :: Vector{Float64}
     CU0 :: LowerTriangular{Float64,Matrix{Float64}}
 end
 
 export EndogProbitGaussianDGP
+
+covardim(dgp::EndogProbitDGP) = (length(dgp.γ0), length(dgp.π0))
