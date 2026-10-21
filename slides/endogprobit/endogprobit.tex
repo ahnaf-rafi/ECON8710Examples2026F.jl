@@ -221,6 +221,12 @@ positive definite, \((\epsilon, \nu) \indep S\) and
 \end{itemize}
 \end{frame}
 
+\section{Maximum likelihood}
+\begin{frame}[plain,noframenumbering]
+  \frametitle{Outline}
+  \tableofcontents[currentsection]
+\end{frame}
+
 \begin{frame}{Conditional log-likelihood}
 Let \(p_{\vartheta} (\cdot | \cdot)\) be the conditional density of \((Y,
 D)\) given \(S\) at candidate \(\vartheta\) for \(\vartheta_{0}\).
@@ -268,6 +274,194 @@ The conditional log-likelihood is (up to an additive constant) equal to the
 sample sum of the above;
 the negative average conditional log-likelihood is that multiplied by a factor
 of \(-1/n\).
+\end{frame}
+
+\begin{frame}{Conditional log-likelihood: index and its gradient}
+Let \(\phi\) be the standard normal density.
+For \(\tau > 0\) and \(|\rho| < 1\), define
+\begin{equation*}
+  q = \frac{\alpha D + X' \beta - \rho (D - S' \delta) / \sqrt{\tau}}
+  {\sqrt{1 - \rho^{2}}}, \quad
+  r = (2 Y - 1) \frac{\phi ((2 Y - 1) q)}{\Phi ((2 Y - 1) q)}.
+\end{equation*}
+\vfill
+Holding the observation fixed, (with \((\delta = (\gamma', \pi')')\)),
+\begin{equation*}
+  \begin{gathered}
+    \partial_{\alpha} q = \frac{D}{\sqrt{1 - \rho^{2}}}, \quad
+    \nabla_{\beta} q = \frac{X}{\sqrt{1 - \rho^{2}}}, \quad
+    \nabla_{\delta} q = \frac{\rho S}{\sqrt{\tau (1 - \rho^{2})}}, \\
+    \partial_{\tau} q =
+    \frac{\rho (D - S' \delta)}{2 \tau^{3/2} \sqrt{1 - \rho^{2}}}, \quad
+    \partial_{\rho} q =
+    \frac{\rho (\alpha D + X' \beta) - (D - S' \delta) / \sqrt{\tau}}
+    {(1 - \rho^{2})^{3/2}}.
+  \end{gathered}
+\end{equation*}
+\end{frame}
+
+\begin{frame}{Conditional log-likelihood: gradient}
+Since \(\partial_{q} \log \Phi ((2 Y - 1) q) = r\), it follows from the chain
+rule that
+\begin{equation*}
+  \nabla_{\vartheta} \ell_{\vartheta} (\xi) =
+  \begin{pmatrix}
+    0 \\
+    \mathbf{0}_{k} \\
+    (D - S' \delta) S / \tau \\
+    ((D - S' \delta)^{2} - \tau) / (2 \tau^{2}) \\
+    0
+  \end{pmatrix}
+  + r \nabla_{\vartheta} q.
+\end{equation*}
+\vfill
+For programming, use the gradient of the negative average conditional
+log-likelihood:
+\begin{equation*}
+  \nabla_{\vartheta} \left(-\frac{1}{n} \sum_{i = 1}^{n}
+  \ell_{\vartheta} (\xi_{i})\right) = -\frac{1}{n} \sum_{i = 1}^{n}
+  \nabla_{\vartheta} \ell_{\vartheta} (\xi_{i}).
+\end{equation*}
+\end{frame}
+
+\begin{frame}{Conditional log-likelihood: Hessian}
+Holding \(Y\) fixed, \(\partial_{q} r = -r (q + r)\).
+Therefore
+\begin{equation*}
+  \nabla_{\vartheta}^{2} \ell_{\vartheta} (\xi) = \nabla_{\vartheta}^{2}
+  \left(-\frac{1}{2} \log \tau - \frac{(D - S' \delta)^{2}}{2 \tau}\right) - r
+  (q + r) (\nabla_{\vartheta} q) (\nabla_{\vartheta} q)' + r
+  \nabla_{\vartheta}^{2} q.
+\end{equation*}
+In the above,
+\begingroup
+\renewcommand{\arraystretch}{1.5}
+\begin{equation*}
+  \nabla_{\vartheta}^{2} \left(-\frac{1}{2} \log \tau
+  - \frac{(D - S' \delta)^{2}}{2 \tau}\right) =
+  \begin{pmatrix}
+    0 & \mathbf{0}' & \mathbf{0}' & 0 & 0 \\
+    \mathbf{0} & \mathbf{0} & \mathbf{0} & \mathbf{0} & \mathbf{0} \\
+    \mathbf{0} & \mathbf{0} & -\frac{S S'}{\tau}
+    & -\frac{(D - S' \delta) S}{\tau^{2}} & \mathbf{0} \\
+    0 & \mathbf{0}' & -\frac{(D - S' \delta) S'}{\tau^{2}}
+    & \frac{1}{2 \tau^{2}} - \frac{(D - S' \delta)^{2}}{\tau^{3}} & 0 \\
+    0 & \mathbf{0}' & \mathbf{0}' & 0 & 0
+  \end{pmatrix}.
+\end{equation*}
+\endgroup
+\end{frame}
+
+\begin{frame}{Conditional log-likelihood: index Hessian}
+For fixed \((\tau, \rho)\), the index \(q\) is affine in
+\((\alpha, \beta', \delta')'\).
+Hence all second derivatives involving only these coefficients are zero.
+\vfill
+The cross-partial derivatives with respect to \(\tau\) are
+\begin{equation*}
+  \partial_{\alpha,\tau}^{2} q = 0, \quad
+  \nabla_{\beta,\tau}^{2} q = \mathbf{0}_{k}, \quad
+  \nabla_{\delta,\tau}^{2} q =
+  -\frac{\rho S}{2 \tau^{3/2} \sqrt{1 - \rho^{2}}}.
+\end{equation*}
+\vfill
+The cross-partial derivatives with respect to \(\rho\) are
+\begin{equation*}
+  \partial_{\alpha,\rho}^{2} q = \frac{\rho D}{(1 - \rho^{2})^{3/2}}, \quad
+  \nabla_{\beta,\rho}^{2} q = \frac{\rho X}{(1 - \rho^{2})^{3/2}}, \quad
+  \nabla_{\delta,\rho}^{2} q =
+  \frac{S}{\sqrt{\tau} (1 - \rho^{2})^{3/2}}.
+\end{equation*}
+\end{frame}
+
+\begin{frame}{Conditional log-likelihood: index Hessian (continued)}
+Remaining second derivatives of \(q\) are
+\begin{equation*}
+  \begin{gathered}
+    \partial_{\tau,\tau}^{2} q =
+    -\frac{3 \rho (D - S' \delta)}{4 \tau^{5/2} \sqrt{1 - \rho^{2}}}, \quad
+    \partial_{\tau,\rho}^{2} q =
+    \frac{D - S' \delta}{2 \tau^{3/2} (1 - \rho^{2})^{3/2}}, \\
+    \partial_{\rho,\rho}^{2} q =
+    \frac{(1 + 2 \rho^{2}) (\alpha D + X' \beta)
+    - 3 \rho (D - S' \delta) / \sqrt{\tau}}{(1 - \rho^{2})^{5/2}}.
+  \end{gathered}
+\end{equation*}
+\vfill
+These blocks, together with the previous slide, determine
+\(\nabla_{\vartheta}^{2} q\) and hence
+\(\nabla_{\vartheta}^{2} \ell_{\vartheta} (\xi)\).
+\vfill
+For the negative average conditional log-likelihood, the Hessian is
+\begin{equation*}
+  \nabla_{\vartheta}^{2} \left(-\frac{1}{n} \sum_{i = 1}^{n}
+  \ell_{\vartheta} (\xi_{i})\right) = -\frac{1}{n} \sum_{i = 1}^{n}
+  \nabla_{\vartheta}^{2} \ell_{\vartheta} (\xi_{i}).
+\end{equation*}
+\end{frame}
+
+\section{Two-step GMM}
+\begin{frame}[plain,noframenumbering]
+  \frametitle{Outline}
+  \tableofcontents[currentsection]
+\end{frame}
+
+\begin{frame}{Two-step GMM: motivation}
+Maximum likelihood estimates all parameters jointly.
+The model also suggests a simpler sequence of estimation problems.
+\vfill
+Equation for \(D\) implies
+\begin{equation*}
+  \E [S (D - S' \delta_{0})] = \mathbf{0}_{k + l}, \quad
+  \E [(D - S' \delta_{0})^{2}] = \tau_{0}.
+\end{equation*}
+First equation identifies \(\delta_{0}\), and the second identifies
+\(\tau_{0}\).
+Their sample counterparts give least squares and the average squared residual.
+\vfill
+For first stage error, conditional on \((\nu, S)\),
+\begin{equation*}
+  \epsilon \mid (\nu, S) \sim
+  \Normal \left(\frac{\rho_{0}}{\sqrt{\tau_{0}}} \nu,
+  1 - \rho_{0}^{2}\right).
+\end{equation*}
+This suggests a probit regression of \(Y\) on \(D\), \(X\), and the first-stage
+residual.
+\end{frame}
+
+\begin{frame}
+\frametitle{Two step GMM: estimation and inference}
+\begin{itemize}
+  \item For the first stage problem, we simply do an OLS regression of \(D_{i}\)
+    on \(S_{i}\).
+    The moment condition is the usual OLS orthogonality condition.
+    \vfill
+  \item For the second stage problem, we are doing a probit regression of
+    \(Y_{i}\)
+    on \(D_{i}\), \(S_{i}\) and \(\hat{\nu}_{n,i} = D_{i} - S_{i}'
+    \hat{\delta}_{n}\).
+    This is essentially an imputation of the conditional probit index:
+    \begin{equation*}
+      q_{i} (\alpha, \beta, \delta, \tau, \rho) = \frac{\alpha}{\sqrt{1 -
+      \rho^{2}}} D_{i} + X_{i}' \frac{\beta}{\sqrt{1 - \rho^{2}}} -
+      \frac{\rho}{\sqrt{\tau (1 - \rho^{2})}} (D - S'\delta).
+    \end{equation*}
+    \vfill
+  \item The second stage problem also has a moment condition: we are setting the
+    average probit conditional likelihood score equal to zero.
+    \vfill
+  \item Two ways to estimate and do inference:
+    \vfill
+    \begin{enumerate}
+      \item Do first stage and then second second stage separately.
+        Use corrected standard errors based on stacked GMM.
+        \vfill
+      \item Solve the stacked GMM problem.
+        Use the stacked GMM standard errors directly.
+        \vfill
+    \end{enumerate}
+  \item Alternatively, use bootstrap.
+\end{itemize}
 \end{frame}
 
 \end{document}
