@@ -201,83 +201,67 @@ Assume \(\pi \neq \mathbf{0}_{l}\) (rank condition), \(\E [S S']\) is finite and
 positive definite, \((\epsilon, \nu) \indep S\) and
 \begin{equation*}
   \begin{pmatrix} \epsilon \\ \nu \end{pmatrix}
-  \sim \Normal \left(\begin{pmatrix} 0 \\ 0 \end{pmatrix},
-  C_{0} C_{0}'\right), \quad
-  C_{0} =
+  \sim \Normal (\mathbf{0}_{2}, \Sigma_{0}), \quad
+  \Sigma_{0} =
   \begin{pmatrix}
-    1 & 0 \\
-    \rho_{0} & e^{\tau_{0}}
+    1 & \rho_{0} \sqrt{\tau_{0}} \\
+    \rho_{0} \sqrt{\tau_{0}} & \tau_{0}
   \end{pmatrix}.
 \end{equation*}
 \vfill
 \begin{itemize}
-  \item With this parametrization, \(\rho_{0}, \tau_{0}\) always produce a
-    lower triangular Cholesky decomposition of a \(2 \times 2\) covariance
-    matrix.
+  \item We require that \(\rho_{0} \in [-1, 1]\).
+    With this parametrization, \(\Sigma_{0}\) is a covariance matrix.
     \vfill
   \item When \(\rho_{0} \neq 0\), \(D\) is endogenous since it correlates with
     \(\varepsilon\).
     \vfill
   \item The full vector of unknown parameters is \(\vartheta_{0} = (\alpha_{0},
-    \beta_{0}', \gamma_{0}', \pi_{0}', \rho_{0}, \tau_{0})\).
+    \beta_{0}', \gamma_{0}', \pi_{0}', \tau_{0}, \rho_{0})\).
 \end{itemize}
 \end{frame}
 
 \begin{frame}{Conditional log-likelihood}
 Let \(p_{\vartheta} (\cdot | \cdot)\) be the conditional density of \((Y,
 D)\) given \(S\) at candidate \(\vartheta\) for \(\vartheta_{0}\).
-Then
-% Here, density is meant in the Radon-Nikodym sense against the product of
-% counting measure and Lebesgue measure.
-% Evaluated at the observations \((Y, D, S)\),
-% it can be shown that
+For \(\tau > 0\) and \(|\rho| < 1\),
 \begin{equation*}
   \begin{split}
     p_{\vartheta} (Y, D | S) =
-    & \, \frac{\exp \left\{-\frac{(D - S' \delta)^{2}}
-    {2 (\rho^{2} + e^{2 \tau})}\right\}}
-    {\sqrt{2 \pi (\rho^{2} + e^{2 \tau})}}
-    \times \Phi \left(
-    \frac{(\rho^{2} + e^{2 \tau}) (\alpha D + X' \beta)
-    - \rho (D - S' \delta)}
-    {e^{\tau} \sqrt{\rho^{2} + e^{2 \tau}}}\right)^{Y} \\
+    & \, \frac{\exp \left\{-\frac{(D - S' \delta)^{2}}{2 \tau}\right\}}
+    {\sqrt{2 \pi \tau}} \times \Phi \left(
+    \frac{\sqrt{\tau} (\alpha D + X' \beta) - \rho (D - S' \delta)}
+    {\sqrt{\tau (1 - \rho^{2})}}\right)^{Y} \\
     & \times \Phi \left(
-    \frac{\rho (D - S' \delta)
-    - (\rho^{2} + e^{2 \tau}) (\alpha D + X' \beta)}
-    {e^{\tau} \sqrt{\rho^{2} + e^{2 \tau}}}\right)^{1 - Y}.
+    \frac{\rho (D - S' \delta) - \sqrt{\tau} (\alpha D + X' \beta)}
+    {\sqrt{\tau (1 - \rho^{2})}}\right)^{1 - Y}.
   \end{split}
 \end{equation*}
 Take logarithms:
 \begin{equation*}
   \begin{split}
-    % \ell_{\vartheta} (\xi) :=
     \log p_{\vartheta} (Y, D | S) =
-    & \, -\frac{\log (2 \pi)}{2} - \frac{1}{2} \log (\rho^{2} + e^{2
-    \tau}) - \frac{(D - S' \delta)^{2}}{2 (\rho^{2} + e^{2 \tau})} \\
+    & \, -\frac{\log (2 \pi)}{2} - \frac{1}{2} \log \tau
+    - \frac{(D - S' \delta)^{2}}{2 \tau} \\
     & + Y \log \Phi \left(
-    \frac{(\rho^{2} + e^{2 \tau}) (\alpha D + X' \beta)
-    - \rho (D - S' \delta)}
-    {e^{\tau} \sqrt{\rho^{2} + e^{2 \tau}}}\right) \\
+    \frac{\sqrt{\tau} (\alpha D + X' \beta) - \rho (D - S' \delta)}
+    {\sqrt{\tau (1 - \rho^{2})}}\right) \\
     & + (1 - Y) \log \Phi \left(
-    \frac{\rho (D - S' \delta)
-    - (\rho^{2} + e^{2 \tau}) (\alpha D + X' \beta)}
-    {e^{\tau} \sqrt{\rho^{2} + e^{2 \tau}}}\right).
+    \frac{\rho (D - S' \delta) - \sqrt{\tau} (\alpha D + X' \beta)}
+    {\sqrt{\tau (1 - \rho^{2})}}\right).
   \end{split}
 \end{equation*}
 \end{frame}
 
 \begin{frame}{Conditional log-likelihood}
-We can drop the constant term and use another transformation to simplify things
-a little:
+We can drop the constant term and use \(2 Y - 1 \in \{-1, 1\}\) to simplify
+things a little:
 \begin{equation*}
-  \begin{split}
-    \ell_{\vartheta} (\xi) =
-    & \, -\frac{1}{2} \log (\rho^{2} + e^{2 \tau})
-    - \frac{(D - S' \delta)^{2}}{2 (\rho^{2} + e^{2 \tau})} \\
-    & + \log \Phi \left( (2 Y - 1) \cdot \frac{(\rho^{2} + e^{2 \tau}) (\alpha D
-    + X' \beta) - \rho (D - S' \delta)} {e^{\tau} \sqrt{\rho^{2} + e^{2 \tau}}}
-    \right).
-  \end{split}
+  \ell_{\vartheta} (\xi) = -\frac{1}{2} \log \tau
+  - \frac{(D - S' \delta)^{2}}{2 \tau}
+  + \log \Phi \left((2 Y - 1)
+  \frac{\sqrt{\tau} (\alpha D + X' \beta) - \rho (D - S' \delta)}
+  {\sqrt{\tau (1 - \rho^{2})}}\right).
 \end{equation*}
 This will also help reduce computational load later on.
 The conditional log-likelihood is (up to an additive constant) equal to the

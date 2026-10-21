@@ -37,8 +37,8 @@ for j in 1:dS
     end
 end
 ΣU0[dS + 1, dS + 1] = τ0
-ΣU0[dS + 1, dξ] = ρ0
-ΣU0[dξ, dS + 1] = ρ0
+ΣU0[dS + 1, dξ] = ρ0 * σ0
+ΣU0[dξ, dS + 1] = ρ0 * σ0
 ΣU0[dξ, dξ] = 1.0
 # For generating U, it will be a good idea to
 CU0 = cholesky(ΣU0).L
