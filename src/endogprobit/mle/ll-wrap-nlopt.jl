@@ -13,3 +13,5 @@ An empty `G` requests only the objective value.
     end
     return ll_fg!(G, ϑ, data, wgts)
 end
+
+export ll_nlopt_fg!

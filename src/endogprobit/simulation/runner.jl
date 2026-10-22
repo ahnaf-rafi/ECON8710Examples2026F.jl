@@ -1,6 +1,6 @@
 function run_sims(
     n         :: Int,
-    dgp       :: EndogProbitDGP
+    dgp       :: EndogProbitDGP,
     r_start   :: Int,
     r_end     :: Int;
     mseed     :: Int    = 42,
@@ -56,7 +56,7 @@ function run_sims(
         end
 
         # TODO: Crank out the estimation!
-        run_sim_single(...)
+        # run_sim_single(...)
 
         # Log that current iter finished.
         log_progress!(
@@ -73,7 +73,7 @@ function run_sim_single(
     dgp       :: EndogProbitDGP,
     r         :: Int,
     B         :: Int,
-    outpath   :: String;
+    outpath   :: String,
     io        :: IO;
     overwrite :: Bool   = true,
     verbose   :: Bool   = false,
