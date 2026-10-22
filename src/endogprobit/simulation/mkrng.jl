@@ -1,7 +1,7 @@
 abstract type AbstractDispatchedSimRNG end
 
 # Placeholder struct to help mkrng distinguish use case.
-struct EndogProbitSimRNG <: EndogProbitSimRNG end
+struct EndogProbitSimRNG <: AbstractDispatchedSimRNG end
 export EndogProbitSimRNG
 
 """
