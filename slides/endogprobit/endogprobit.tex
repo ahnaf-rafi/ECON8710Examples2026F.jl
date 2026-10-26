@@ -432,19 +432,18 @@ residual.
 \begin{frame}
 \frametitle{Two step GMM: estimation and inference}
 \begin{itemize}
-  \item For the first stage problem, we simply do an OLS regression of \(D_{i}\)
+  \item For first stage problem, we do OLS regression of \(D_{i}\)
     on \(S_{i}\).
-    The moment condition is the usual OLS orthogonality condition.
+    Moment condition is the usual OLS orthogonality condition.
     \vfill
-  \item For the second stage problem, we are doing a probit regression of
-    \(Y_{i}\)
-    on \(D_{i}\), \(S_{i}\) and \(\hat{\nu}_{n,i} = D_{i} - S_{i}'
+  \item For second stage problem, we are doing a probit regression of
+    \(Y_{i}\) on \(D_{i}\), \(X_{i}\) and \(\hat{\nu}_{n,i} = D_{i} - S_{i}'
     \hat{\delta}_{n}\).
     This is essentially an imputation of the conditional probit index:
     \begin{equation*}
       q_{i} (\alpha, \beta, \delta, \tau, \rho) = \frac{\alpha}{\sqrt{1 -
       \rho^{2}}} D_{i} + X_{i}' \frac{\beta}{\sqrt{1 - \rho^{2}}} -
-      \frac{\rho}{\sqrt{\tau (1 - \rho^{2})}} (D - S'\delta).
+      \frac{\rho}{\sqrt{\tau (1 - \rho^{2})}} (D_{i} - S_{i}' \delta).
     \end{equation*}
     \vfill
   \item The second stage problem also has a moment condition: we are setting the
@@ -453,7 +452,7 @@ residual.
   \item Two ways to estimate and do inference:
     \vfill
     \begin{enumerate}
-      \item Do first stage and then second second stage separately.
+      \item Do first stage and then second stage separately.
         Use corrected standard errors based on stacked GMM.
         \vfill
       \item Solve the stacked GMM problem.
@@ -462,6 +461,252 @@ residual.
     \end{enumerate}
   \item Alternatively, use bootstrap.
 \end{itemize}
+\end{frame}
+
+\begin{frame}{Two-step estimation: a linear probit index}
+Write the same conditional index in linear form:
+\begin{equation*}
+  q = a D + X' b + c (D - S' \delta), \quad
+  a = \frac{\alpha}{\sqrt{1 - \rho^{2}}}, \quad
+  b = \frac{\beta}{\sqrt{1 - \rho^{2}}}, \quad
+  c = -\frac{\rho}{\sqrt{\tau (1 - \rho^{2})}}.
+\end{equation*}
+\vfill
+\begin{enumerate}
+  \item Regress \(D_{i}\) on \(S_{i}\) by OLS to obtain
+    \(\hat{\delta}_{n}\), and compute
+    \begin{equation*}
+      \hat{\nu}_{n,i} = D_{i} - S_{i}' \hat{\delta}_{n}, \quad
+      \hat{\tau}_{n} = \frac{1}{n} \sum_{i = 1}^{n} \hat{\nu}_{n,i}^{2}.
+    \end{equation*}
+    \vfill
+  \item Run an ordinary probit of \(Y_{i}\) on \(D_{i}\), \(X_{i}\), and
+    \(\hat{\nu}_{n,i}\) to obtain \((\hat{a}_{n}, \hat{b}_{n}',
+    \hat{c}_{n})'\).
+    \vfill
+  \item Transform these coefficients back to the structural parameters.
+\end{enumerate}
+%
+% \vfill
+%
+% For \(\tau > 0\), the coefficient on the residual identifies \(\rho\):
+% \begin{equation*}
+%   c^{2} \tau = \frac{\rho^{2}}{1 - \rho^{2}}, \quad
+%   \rho = -\frac{c \sqrt{\tau}}{\sqrt{1 + c^{2} \tau}}, \quad
+%   \sqrt{1 - \rho^{2}} = \frac{1}{\sqrt{1 + c^{2} \tau}}.
+% \end{equation*}
+\vfill
+The estimates of interest are
+\begin{equation*}
+  \hat{\alpha}_{n} = \frac{\hat{a}_{n}}
+  {\sqrt{1 + \hat{c}_{n}^{2} \hat{\tau}_{n}}}, \quad
+  \hat{\beta}_{n} = \frac{\hat{b}_{n}}
+  {\sqrt{1 + \hat{c}_{n}^{2} \hat{\tau}_{n}}}.
+\end{equation*}
+\end{frame}
+
+\begin{frame}{Two-step GMM: stacked moment condition}
+Group the parameters as \(\eta = (\delta', \tau)'\) and
+\(\theta = (a, b', c)'\).
+\begin{equation*}
+  g (\xi, \eta, \theta) =
+  \begin{pmatrix} g_{1} (\xi, \eta) \\ g_{2} (\xi, \eta, \theta) \end{pmatrix}
+  = \begin{pmatrix}
+    S (D - S' \delta) \\
+    (D - S' \delta)^{2} - \tau \\
+    r \nabla_{\theta} q
+  \end{pmatrix}, \quad
+  \nabla_{\theta} q = \begin{pmatrix} D \\ X \\ D - S' \delta \end{pmatrix}.
+\end{equation*}
+\vfill
+At the true parameter values,
+\begin{equation*}
+  \E [g (\xi, \eta_{0}, \theta_{0})] = \mathbf{0}_{2 k + l + 3}.
+\end{equation*}
+Here \(g_{1}\) has \(k + l + 1\) entries and \(g_{2}\) has \(k + 2\).
+These are exactly identified moments.
+\end{frame}
+
+\begin{frame}{Two-step GMM: derivative of the moments}
+Order derivative columns as \((\eta', \theta')\).
+\begin{equation*}
+  \frac{\partial g}{\partial (\eta', \theta')} =
+  \begin{pmatrix}
+    \frac{\partial g_{1}}{\partial \eta'} & \mathbf{0} \\
+    \frac{\partial g_{2}}{\partial \eta'} &
+    \frac{\partial g_{2}}{\partial \theta'}
+  \end{pmatrix}, \quad
+  \frac{\partial g_{1}}{\partial \eta'} =
+  \begin{pmatrix}
+    -S S' & \mathbf{0}_{k + l} \\
+    -2 (D - S' \delta) S' & -1
+  \end{pmatrix}.
+\end{equation*}
+\vfill
+Since \(\partial_{q} r = -r (q + r)\) and \(\nabla_{\theta}^{2} q = 0\),
+\begin{equation*}
+  \begin{split}
+    \frac{\partial g_{2}}{\partial \eta'} =
+    & \, -r (q + r) (\nabla_{\theta} q) (\nabla_{\eta} q)'
+    + r \frac{\partial (\nabla_{\theta} q)}{\partial \eta'}, \\
+    \frac{\partial g_{2}}{\partial \theta'} =
+    & \, -r (q + r) (\nabla_{\theta} q) (\nabla_{\theta} q)'.
+  \end{split}
+\end{equation*}
+Second-stage derivative wrt \(\tau\) is zero.
+Derivative wrt \(\delta\) accounts for generated residual.
+\end{frame}
+
+\begin{frame}{Two-step GMM: dependence on the estimated residual}
+For the linear index \(q = a D + X' b + c (D - S' \delta)\),
+\begin{equation*}
+  \nabla_{\eta} q = \begin{pmatrix} -c S \\ 0 \end{pmatrix}, \quad
+  \frac{\partial (\nabla_{\theta} q)}{\partial \eta'} =
+  \begin{pmatrix}
+    \mathbf{0}_{k + l}' & 0 \\
+    \mathbf{0}_{k \times (k + l)} & \mathbf{0}_{k} \\
+    -S' & 0
+  \end{pmatrix}.
+\end{equation*}
+\vfill
+Therefore,
+\begin{equation*}
+  \frac{\partial g_{2}}{\partial \delta'} =
+  c r (q + r)
+  \begin{pmatrix} D \\ X \\ D - S' \delta \end{pmatrix} S'
+  - r \begin{pmatrix}
+    \mathbf{0}_{k + l}' \\
+    \mathbf{0}_{k \times (k + l)} \\
+    S'
+  \end{pmatrix}, \quad
+  \frac{\partial g_{2}}{\partial \tau} = \mathbf{0}_{k + 2}.
+\end{equation*}
+\end{frame}
+
+\begin{frame}{Two-step GMM: population derivative}
+Denote the three derivative blocks by
+\begin{equation*}
+  A = \E \left[\frac{\partial g_{1}}{\partial \eta'}\right], \quad
+  B = \E \left[\frac{\partial g_{2}}{\partial \eta'}\right], \quad
+  C = \E \left[\frac{\partial g_{2}}{\partial \theta'}\right].
+\end{equation*}
+Since \(\E [S \nu] = \mathbf{0}\) and \(\E [r \mid D, S] = 0\),
+\begin{equation*}
+  \begin{gathered}
+    A = \begin{pmatrix} -\E [S S'] & \mathbf{0} \\
+      \mathbf{0}' & -1 \end{pmatrix}, \quad
+    B = \left(c_{0} \E [r (q + r) (\nabla_{\theta} q) S'],
+    \mathbf{0}_{k + 2}\right), \\
+    C = -\E [r (q + r) (\nabla_{\theta} q) (\nabla_{\theta} q)'].
+  \end{gathered}
+\end{equation*}
+\end{frame}
+
+\begin{frame}{Two-step estimation: first-stage correction}
+By Taylor expansion,
+\begin{equation*}
+  \begin{split}
+    \sqrt{n} (\hat{\eta}_{n} - \eta_{0}) =
+    & \, -A^{-1} \frac{1}{\sqrt{n}} \sum_{i = 1}^{n}
+    g_{1} (\xi_{i}, \eta_{0}) + \op (1), \\
+    \sqrt{n} (\hat{\theta}_{n} - \theta_{0}) =
+    & \, -C^{-1} \frac{1}{\sqrt{n}} \sum_{i = 1}^{n}
+    \left\{g_{2} (\xi_{i}, \eta_{0}, \theta_{0})
+    - B A^{-1} g_{1} (\xi_{i}, \eta_{0})\right\} + \op (1).
+  \end{split}
+\end{equation*}
+\vfill
+Thus, asymptotic variance for linear-index coefficients is
+\begin{equation*}
+  V_{\theta} = C^{-1} \Var [g_{2} - B A^{-1} g_{1}] (C^{-1})'.
+\end{equation*}
+\vfill
+This variance concerns \((\hat{a}_{n}, \hat{b}_{n}', \hat{c}_{n})'\).
+Standard errors for the coefficients of interest,
+\((\hat{\alpha}_{n}, \hat{\beta}_{n}')'\), require the delta method as well.
+\end{frame}
+
+\begin{frame}{Two-step estimation: variance under the Gaussian model}
+At the truth, \(\E [g_{2} \mid D, S] = \mathbf{0}\), so
+\(\Cov (g_{1}, g_{2}) = \mathbf{0}\), and \(\Var (g_{2}) = -C\).
+The first-stage covariance is
+\begin{equation*}
+  A^{-1} \Var (g_{1}) (A^{-1})' =
+  \begin{pmatrix}
+    \tau_{0} (\E [S S'])^{-1} & \mathbf{0} \\
+    \mathbf{0}' & 2 \tau_{0}^{2}
+  \end{pmatrix}.
+\end{equation*}
+Hence
+\begin{equation*}
+  V_{\theta} = -C^{-1} + C^{-1} B
+  \begin{pmatrix}
+    \tau_{0} (\E [S S'])^{-1} & \mathbf{0} \\
+    \mathbf{0}' & 2 \tau_{0}^{2}
+  \end{pmatrix} B' (C^{-1})'.
+\end{equation*}
+\vfill
+The last column of \(B\) is zero, and the first-stage covariance is block
+diagonal.
+Therefore the limiting covariance between \(\hat{\tau}_{n}\) and
+\(\hat{\theta}_{n}\) is zero:
+\begin{equation*}
+  \sqrt{n} \begin{pmatrix}
+    \hat{\tau}_{n} - \tau_{0} \\ \hat{\theta}_{n} - \theta_{0}
+  \end{pmatrix} \dto \Normal \left(\mathbf{0},
+  \begin{pmatrix} 2 \tau_{0}^{2} & \mathbf{0}' \\
+    \mathbf{0} & V_{\theta} \end{pmatrix}\right).
+\end{equation*}
+\end{frame}
+
+\begin{frame}{Main-equation coefficients: the delta method}
+Differentiate the coefficients of interest \((\alpha, \beta')'\) with respect to
+\((\tau, a, b', c)\):
+\begin{equation*}
+  J = \frac{\partial (\alpha, \beta')'}
+  {\partial (\tau, a, b', c)} = \frac{1}{(1 + c^{2} \tau)^{3/2}}
+  \begin{pmatrix}
+    -a c^{2} / 2 & 1 + c^{2} \tau & \mathbf{0}_{k}' & -a c \tau \\
+    -b c^{2} / 2 & \mathbf{0}_{k} & (1 + c^{2} \tau) I_{k} & -b c \tau
+  \end{pmatrix}.
+\end{equation*}
+Here \(I_{k}\) is the \(k \times k\) identity matrix.
+\vfill
+Let \(J_{0}\) be this matrix at \((\tau_{0}, a_{0}, b_{0}', c_{0})\).
+The asymptotic variance of \(\sqrt{n} ((\hat{\alpha}_{n},
+\hat{\beta}_{n}')' - (\alpha_{0}, \beta_{0}')')\) is
+\begin{equation*}
+  J_{0} \begin{pmatrix} 2 \tau_{0}^{2} & \mathbf{0}' \\
+    \mathbf{0} & V_{\theta} \end{pmatrix} J_{0}'.
+\end{equation*}
+First diagonal entry gives asymptotic variance for \(\alpha\);
+the remaining block is for \(\beta\).
+\end{frame}
+
+\begin{frame}{Main-equation coefficients: feasible standard errors}
+For a sample sandwich, let \(\hat{A}\), \(\hat{B}\), and \(\hat{C}\) be
+sample averages of the derivative blocks at \((\hat{\eta}_{n},
+\hat{\theta}_{n})\).
+Estimate joint asymptotic covariance by
+\begin{equation*}
+  \hat{V} =
+  \begin{pmatrix} \hat{A} & \mathbf{0} \\
+    \hat{B} & \hat{C} \end{pmatrix}^{-1}
+  \left[\frac{1}{n} \sum_{i = 1}^{n}
+    g (\xi_{i}, \hat{\eta}_{n}, \hat{\theta}_{n})
+    g (\xi_{i}, \hat{\eta}_{n}, \hat{\theta}_{n})'\right]
+  \left[\begin{pmatrix} \hat{A} & \mathbf{0} \\
+    \hat{B} & \hat{C} \end{pmatrix}^{-1}\right]'.
+\end{equation*}
+\vfill
+Extract submatrix for \((\tau, a, b', c)'\), denoted
+\(\hat{V}_{(\tau,\theta)}\), and evaluate \(J\) at the estimates.
+The estimated covariance of \((\hat{\alpha}_{n}, \hat{\beta}_{n}')'\) is
+\begin{equation*}
+  \frac{1}{n} \hat{J} \hat{V}_{(\tau,\theta)} \hat{J}'.
+\end{equation*}
+Standard error for \(\hat{\alpha}_{n}\) is the square root of first
+diagonal entry; remaining diagonal entries give those for \(\hat{\beta}_{n}\).
 \end{frame}
 
 \end{document}

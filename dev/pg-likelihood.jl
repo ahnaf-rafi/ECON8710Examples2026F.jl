@@ -54,7 +54,7 @@ dη = length(η0)                # First stage parameter: length.
 dgp = EndogProbitGaussianDGP(α0, β0, π0, γ0, CU0)
 
 # Set a sample size to do pilot runs with.
-n = 2000
+n = 500
 
 # Struct for data storage.
 data = EndogProbitData(n, k, l)
