@@ -3,8 +3,13 @@ module ECON8710Examples2026F
 using LinearAlgebra
 using Random
 using Dates
+using NLopt
+using Optim
 
 using StatsFuns: normcdf, normpdf, normlogcdf
+using LogExpFunctions
+
+using Distributions  # Needed for Poisson number generation.
 
 # Useful constants.
 const LOG2PI = log(2π)
@@ -32,6 +37,20 @@ include("utilities/weights/unifsym.jl")
 include("utilities/weights/exp.jl")
 include("utilities/weights/gauss.jl")
 
+#-----#
+# OLS #
+#-----#
+include("ols/ols-estimate.jl")
+
+#--------#
+# Probit #
+#--------#
+include("probit/types.jl")
+include("probit/ll-f.jl")
+include("probit/ll-g.jl")
+include("probit/ll-h.jl")
+include("probit/ll-wrap-nlopt.jl")
+
 #-----------------------------------------------#
 # Probit model with single endogenous regressor #
 #-----------------------------------------------#
@@ -46,6 +65,10 @@ include("endogprobit/mle/ll-g-outprod.jl")
 include("endogprobit/mle/ll-wrap-nlopt.jl")
 include("endogprobit/mle/ll-wrap-optim.jl")
 # include("endogprobit/mle/ll-wrap-jso.jl")
+
+# Two-step GMM
+include("endogprobit/twostep/base.jl")
+include("endogprobit/twostep/solver.jl")
 
 # Simulation setup.
 # RNG constructor for split simulations.

@@ -23,6 +23,4 @@ end
 
 export munifm1v1, munifm1v1_rand, munifm1v1_rand!
 
-@inline wgts!(
-    rng::AbstractRNG, w::Vector{Float64}, ::MixtureUniformWeights
-) = mixunifm1v1!(rng, w)
+@inline wgts!(rng::AbstractRNG, w::Vector{Float64}, ::MixtureUniformWeights) = mixunifm1v1!(rng, w)

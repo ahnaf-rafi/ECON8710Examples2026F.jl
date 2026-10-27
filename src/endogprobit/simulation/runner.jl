@@ -10,7 +10,7 @@ function run_sims(
     r_end     :: Int;
     ρlo       :: Float64 = -1.0+1e-12,
     ρhi       :: Float64 = 1.0-1e-12,
-    nρgrid    :: Int     = 201,
+    # nρgrid    :: Int     = 201,
     B         :: Int     = 1000,
     mseed     :: Int     = 42,
     tolf      :: Float64 = 1e-12,
@@ -44,6 +44,9 @@ function run_sims(
         verbose=verbose, endline=endline1
     )
 
+    # Precompute sampler for 1:n
+    s = Random.Sampler(rng, 1:n)
+
     # Create storage (structs of) arrays.
     k, l = covardim(dgp)
     dϑ   = (2k) + l + 3
@@ -59,7 +62,7 @@ function run_sims(
     mlelb = fill(-Inf, dϑ)
     mleub = fill(Inf, dϑ)
     mlelb[dϑ-1] = eps(Float64) # Ensure positive variance estimates.
-    optmle = NLopt.Opt(:LD_LBFGS, dϑ)
+    mleopt = NLopt.Opt(:LD_LBFGS, dϑ)
 
     # Construct grid of interval endpoints for ρ.
     ρgrid = collect(range(ρlo, ρhi; length=nρgrid))
@@ -84,21 +87,35 @@ function run_sims(
         end
 
         # TODO: Crank out the estimation!
-        # run_sim_single(...)
+        # run_sim_single!(...)
 
         # Log that current iter finished.
         log_progress!(
             io, "  r=$r completed."; verbose=verbose, endline=endline
         )
     end
+
+    log_progress!(io, "  Done."; verbose=verbose, endline=endline)
+    close(io)
+
+    return nothing
 end
 
 export run_sims
 
-function run_sim_single(
+function run_sim_single!(
     rng       :: AbstractRNG,
+    ϑmle      :: Vector{Float64},
+    ϑmle_b    :: Vector{Float64},
+    optmle    :: NLopt.Opt,
     data      :: EndogProbitData,
     dgp       :: EndogProbitDGP,
+    wgts      :: Vector{T},
+    s         :: Random.Sampler,
+    mlelb     :: Vector{Float64},
+    mleub     :: Vector{Float64},
+    ρlo       :: Float64 = -1.0+1e-12,
+    ρhi       :: Float64 = 1.0-1e-12,
     r         :: Int,
     B         :: Int,
     outpath   :: String,
@@ -106,11 +123,14 @@ function run_sim_single(
     overwrite :: Bool   = true,
     verbose   :: Bool   = false,
     endline   :: String ="\n"
-)
+) where T
     # Generate data.
     gen!(rng, data, dgp)
 
     # TODO: Fit MLE.
+    min_objective!(optmle, (ϑ, G) -> ll_nlopt_fg!(ϑ, G, data, nothing))
+    optimize!(optmle, ϑmle)
+
     # TODO: Fit GMM.
     # TODO: Calculate estimates of asymptotic variance matrix.
     # TODO: Conduct bootstraps.
