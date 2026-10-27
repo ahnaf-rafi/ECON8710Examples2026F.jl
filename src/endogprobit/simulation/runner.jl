@@ -1,17 +1,31 @@
+abstract type MLEBackend end
+struct MLEOptimBackend <: MLEBackend end
+struct MLENLoptBackend <: MLEBackend end
+
 function run_sims(
+              :: MLENLoptBackend,
     n         :: Int,
     dgp       :: EndogProbitDGP,
     r_start   :: Int,
     r_end     :: Int;
-    mseed     :: Int    = 42,
-    verbose   :: Bool   = false,
-    overwrite :: Bool   = false,
-    endline1  :: String = "\n",
-    endline2  :: String = "\r",
-    logdir    :: String = "logs",
-    outdir    :: String = "results-raw",
-    n_pad     :: Int    = 3,
-    r_pad     :: Int    = 4
+    ρlo       :: Float64 = -1.0+1e-12,
+    ρhi       :: Float64 = 1.0-1e-12,
+    nρgrid    :: Int     = 201,
+    B         :: Int     = 1000,
+    mseed     :: Int     = 42,
+    tolf      :: Float64 = 1e-12,
+    tolx      :: Float64 = 1e-12,
+    tolg      :: Float64 = 1e-12,
+    maxiter   :: Int     = 1000,
+    maxgrads  :: Int     = 100,
+    verbose   :: Bool    = false,
+    overwrite :: Bool    = false,
+    endline1  :: String  = "\n",
+    endline2  :: String  = "\r",
+    logdir    :: String  = "logs",
+    outdir    :: String  = "results-raw",
+    n_pad     :: Int     = 3,
+    r_pad     :: Int     = 4
 )
     ispath(logdir) || mkpath(logdir)  # Make logging directory if needed.
     ispath(outdir) || mkpath(outdir)  # Make results directory if needed.
@@ -32,11 +46,25 @@ function run_sims(
 
     # Create storage (structs of) arrays.
     k, l = covardim(dgp)
+    dϑ   = (2k) + l + 3
     data = EndogProbitData(n, k, l)
 
+    ϑhat  = Vector{Float64}(undef, dϑ)
+    ϑinit = Vector{Float64}(undef, dϑ)
+    ϑwork = Vector{Float64}(undef, dϑ)
+    ϑbtst = Vector{Float64}(undef, dϑ)
+    ϑs_btst = Matrix{Float64}(undef, dϑ, B)
+
+    # Construct optimizer object for NLopt.
+    mlelb = fill(-Inf, dϑ)
+    mleub = fill(Inf, dϑ)
+    mlelb[dϑ-1] = eps(Float64) # Ensure positive variance estimates.
+    optmle = NLopt.Opt(:LD_LBFGS, dϑ)
+
+    # Construct grid of interval endpoints for ρ.
+    ρgrid = collect(range(ρlo, ρhi; length=nρgrid))
+
     for r in r_start:r_end
-        # TODO: Check if being asked to overwrite. If not, exit early.
-        # !overwrite && <check-output-existence> && return nothing
         outpath = namer(r)
         # Skip iteration if overwrite=false and output file exists.
         if !overwrite && isfile(outpath)

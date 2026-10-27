@@ -6,6 +6,9 @@ using Random
 using StatsFuns: normcdf, normpdf,  normlogcdf
 using Optim
 using NLopt
+using BenchmarkTools
+
+include("pg-likelihood-fit-func.jl")
 
 #-----------#
 # DGP setup #
@@ -69,35 +72,64 @@ wgts = nothing
 
 # MLE code here.
 ϑinit = copy(ϑ0)
+ϑhat  = copy(ϑ0)
+ϑwork = copy(ϑ0)
 
-# Set tolerances.
+# Optimization params.
 tolf  = 0.0     # 1e-12
 tolx  = 1e-12
 tolg = 1e-12
 maxiter = 1000
 maxgrads = 100
+mlelb = fill(-Inf, dϑ)
+mleub = fill(Inf, dϑ)
+mlelb[dϑ] = -0.9
+mleub[dϑ] = 0.9
+
+ρlo = -1.0+1e-12
+ρhi = 1.0-1e-12
+nρgrid = 201
 
 opt = NLopt.Opt(:LD_LBFGS, dϑ)
 
+ρgrid = collect(range(ρlo, ρhi; length=nρgrid))
+
+fit_mle!(opt, ϑhat, ϑinit, ϑwork, mlelb, mleub, ρgrid, data, wgts)
+
+@benchmark fit_mle!(
+    $opt, $ϑhat, $ϑinit, $ϑwork, $mlelb, $mleub, $ρgrid, $data, $wgts
+)
+
+
+
+evals=1
+
+
 # Set optimization objective
+opt = NLopt.Opt(:LD_LBFGS, dϑ)
 min_objective!(opt, (ϑ, G) -> ll_nlopt_fg!(ϑ, G, data, wgts))
 
 # Set bounds
-optlb = fill(-Inf, dϑ)
-optub = fill(Inf, dϑ)
-optlb[dϑ] = -0.9
-optub[dϑ] = 0.9
-NLopt.lower_bounds!(opt, optlb)
-NLopt.upper_bounds!(opt, optub)
+mlelb = fill(-Inf, dϑ)
+mleub = fill(Inf, dϑ)
+mlelb[dϑ] = -0.9
+mleub[dϑ] = 0.9
+
+NLopt.lower_bounds!(opt, mlelb)
+NLopt.upper_bounds!(opt, mleub)
 
 NLopt.ftol_abs!(opt, tolf)
 NLopt.xtol_abs!(opt, tolx)
-NLopt.NLopt.nlopt_set_param(opt, "tolg", tolg)
+NLopt.nlopt_set_param(opt, "tolg", tolg)
 NLopt.maxeval!(opt, maxiter)
 NLopt.vector_storage!(opt, maxgrads)
 
 # optf, optx, ret = optimize!(opt, ϑinit)
-res1 = optimize!(opt, ϑinit)
+@benchmark optimize!($opt, $ϑwork) setup=(
+    copyto!($ϑwork, $ϑinit)
+)
+
+optimize!(opt, ϑinit)
 niters = NLopt.numevals(opt)
 
 # Profile likelihood: endpoints are undefined.
