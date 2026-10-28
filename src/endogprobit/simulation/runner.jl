@@ -115,6 +115,7 @@ function run_sims(
         rng = mkrng(EndogProbitSimRNG(), mseed, n, r)
         s = Random.Sampler(rng, 1:n)
         copyto!(ϑmle, ϑinit)
+        ϑmle[end] = 0.0
 
         # Crank out estimation!
         run_sim_single!(
@@ -195,6 +196,7 @@ function run_sim_single!(
         wgts!(rng, wgts, s, MultinomialWeights())
 
         copyto!(ϑmle_b, ϑmle)
+        ϑmle_b[end] = 0.0
         llval_bm, _, status_bm = optimize!(optmle, ϑmle_b)
         vcov_mle!(ϑmle_b, wsmle, wgts)
         αs_mle_bm[b] = ϑmle_b[ialpha]
@@ -213,6 +215,7 @@ function run_sim_single!(
         wgts!(rng, wgts, ExponentialWeights())
 
         copyto!(ϑmle_b, ϑmle)
+        ϑmle_b[end] = 0.0
         llval_be, _, status_be = optimize!(optmle, ϑmle_b)
         vcov_mle!(ϑmle_b, wsmle, wgts)
         αs_mle_be[b] = ϑmle_b[ialpha]
