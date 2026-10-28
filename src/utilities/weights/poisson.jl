@@ -31,3 +31,5 @@ function wgts!(rng::AbstractRNG, w::AbstractVector{T}, ::PoissonWeights) where T
     end
     return w
 end
+
+export PoissonWeights

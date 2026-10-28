@@ -32,3 +32,5 @@ function wgts!(rng::AbstractRNG, w::Vector{Float64}, ::SymmetricUniformWeights)
     unifsym_rand!(rng, w, sqrt(3.0))
     w .+= 1.0
 end
+
+export SymmetricUniformWeights

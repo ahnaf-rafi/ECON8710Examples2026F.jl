@@ -1,5 +1,5 @@
 """
-    ll_ggp!(GGp, ϑ::Vector{Float64}, data::EndogProbitData, wgts=nothing)
+    ll_ggp!(GGp, ϑ::Vector{Float64}, ws::EndogProbitMLEWorkspace, wgts=nothing)
 
 Overwrite `GGp` with the average outer product of observation-level gradients.
 If `gi` is the gradient of observation i's unweighted negative loglikelihood,
@@ -7,16 +7,16 @@ the result is `sum(wi * gi * gi') / n`.
 
 Parameter vector is ordered as `ϑ = [β; γ; π; α; τ; ρ]`, where `τ = Var(ν) > 0`
 and `ρ = Corr(ν, ϵ) ∈ (-1, 1)`.
-Observations are columns of `data.ξs`, with rows ordered as `[X; Z; D; Y]`
+Observations are columns of `ws.ξs`, with rows ordered as `[X; Z; D; Y]`
 and outcomes `Y` coded as `-1` or `1`.
 
 `wgts` is either `nothing` for unit weights or a real vector with one weight
 per observation. Zero-weight observations are skipped.
 """
-function ll_ggp!(GGp, ϑ::Vector{Float64}, data::EndogProbitData, wgts=nothing)
-    n = size(data.ξs, 2)
-    k = data.k
-    l = data.l
+function ll_ggp!(GGp, ϑ::Vector{Float64}, ws::EndogProbitMLEWorkspace, wgts=nothing)
+    n = size(ws.ξs, 2)
+    k = ws.k
+    l = ws.l
 
     # Iterate once through back and extract params.
     rownumϑ = (2k) + l + 1
@@ -55,14 +55,14 @@ function ll_ggp!(GGp, ϑ::Vector{Float64}, data::EndogProbitData, wgts=nothing)
         # Calculate X'β.
         Xβi = 0.0
         for j in 1:k
-            Xβi += data.ξs[j,i] * ϑ[rownumϑ]
+            Xβi += ws.ξs[j,i] * ϑ[rownumϑ]
             rownumϑ += 1
         end
 
         # Calculate X'γ.
         Xγi = 0.0
         for _ in 1:k
-            Xγi += data.ξs[rownumξ,i] * ϑ[rownumϑ]
+            Xγi += ws.ξs[rownumξ,i] * ϑ[rownumϑ]
             rownumξ += 1
             rownumϑ += 1
         end
@@ -70,15 +70,15 @@ function ll_ggp!(GGp, ϑ::Vector{Float64}, data::EndogProbitData, wgts=nothing)
         # Calculate Z'π.
         Zπi = 0.0
         for _ in 1:l
-            Zπi += data.ξs[rownumξ,i] * ϑ[rownumϑ]
+            Zπi += ws.ξs[rownumξ,i] * ϑ[rownumϑ]
             rownumξ += 1
             rownumϑ += 1
         end
 
         # Extract D and Y.
-        Di = data.ξs[rownumξ,i]
+        Di = ws.ξs[rownumξ,i]
         rownumξ += 1
-        Yi = data.ξs[rownumξ,i]
+        Yi = ws.ξs[rownumξ,i]
 
         # Calculate first stage residual
         νi = Di - Xγi - Zπi
@@ -117,29 +117,29 @@ function ll_ggp!(GGp, ϑ::Vector{Float64}, data::EndogProbitData, wgts=nothing)
             rownumϑ = colnumϑ
 
             for a in j:k
-                GGp[rownumϑ,colnumϑ] += wi * prodββi * data.ξs[a,i] * data.ξs[j,i]
+                GGp[rownumϑ,colnumϑ] += wi * prodββi * ws.ξs[a,i] * ws.ξs[j,i]
                 rownumϑ += 1
             end
 
             for _ in 1:k
                 GGp[rownumϑ,colnumϑ] += wi * prodδβi *
-                    data.ξs[rownumξ,i] * data.ξs[j,i]
+                    ws.ξs[rownumξ,i] * ws.ξs[j,i]
                 rownumξ += 1
                 rownumϑ += 1
             end
 
             for _ in 1:l
                 GGp[rownumϑ,colnumϑ] += wi * prodδβi *
-                    data.ξs[rownumξ,i] * data.ξs[j,i]
+                    ws.ξs[rownumξ,i] * ws.ξs[j,i]
                 rownumξ += 1
                 rownumϑ += 1
             end
 
-            GGp[rownumϑ,colnumϑ] += wi * prodββi * Di * data.ξs[j,i]
+            GGp[rownumϑ,colnumϑ] += wi * prodββi * Di * ws.ξs[j,i]
             rownumϑ += 1
-            GGp[rownumϑ,colnumϑ] += wi * prodτβi * data.ξs[j,i]
+            GGp[rownumϑ,colnumϑ] += wi * prodτβi * ws.ξs[j,i]
             rownumϑ += 1
-            GGp[rownumϑ,colnumϑ] += wi * prodρβi * data.ξs[j,i]
+            GGp[rownumϑ,colnumϑ] += wi * prodρβi * ws.ξs[j,i]
             colnumϑ += 1
         end
 
@@ -149,23 +149,23 @@ function ll_ggp!(GGp, ϑ::Vector{Float64}, data::EndogProbitData, wgts=nothing)
 
             for _ in j:k
                 GGp[rownumϑ,colnumϑ] += wi * prodδδi *
-                    data.ξs[rownumξ,i] * data.ξs[colnumξ,i]
+                    ws.ξs[rownumξ,i] * ws.ξs[colnumξ,i]
                 rownumξ += 1
                 rownumϑ += 1
             end
 
             for _ in 1:l
                 GGp[rownumϑ,colnumϑ] += wi * prodδδi *
-                    data.ξs[rownumξ,i] * data.ξs[colnumξ,i]
+                    ws.ξs[rownumξ,i] * ws.ξs[colnumξ,i]
                 rownumξ += 1
                 rownumϑ += 1
             end
 
-            GGp[rownumϑ,colnumϑ] += wi * prodδβi * Di * data.ξs[colnumξ,i]
+            GGp[rownumϑ,colnumϑ] += wi * prodδβi * Di * ws.ξs[colnumξ,i]
             rownumϑ += 1
-            GGp[rownumϑ,colnumϑ] += wi * prodτδi * data.ξs[colnumξ,i]
+            GGp[rownumϑ,colnumϑ] += wi * prodτδi * ws.ξs[colnumξ,i]
             rownumϑ += 1
-            GGp[rownumϑ,colnumϑ] += wi * prodρδi * data.ξs[colnumξ,i]
+            GGp[rownumϑ,colnumϑ] += wi * prodρδi * ws.ξs[colnumξ,i]
             colnumξ += 1
             colnumϑ += 1
         end
@@ -176,16 +176,16 @@ function ll_ggp!(GGp, ϑ::Vector{Float64}, data::EndogProbitData, wgts=nothing)
 
             for _ in j:l
                 GGp[rownumϑ,colnumϑ] += wi * prodδδi *
-                    data.ξs[rownumξ,i] * data.ξs[colnumξ,i]
+                    ws.ξs[rownumξ,i] * ws.ξs[colnumξ,i]
                 rownumξ += 1
                 rownumϑ += 1
             end
 
-            GGp[rownumϑ,colnumϑ] += wi * prodδβi * Di * data.ξs[colnumξ,i]
+            GGp[rownumϑ,colnumϑ] += wi * prodδβi * Di * ws.ξs[colnumξ,i]
             rownumϑ += 1
-            GGp[rownumϑ,colnumϑ] += wi * prodτδi * data.ξs[colnumξ,i]
+            GGp[rownumϑ,colnumϑ] += wi * prodτδi * ws.ξs[colnumξ,i]
             rownumϑ += 1
-            GGp[rownumϑ,colnumϑ] += wi * prodρδi * data.ξs[colnumξ,i]
+            GGp[rownumϑ,colnumϑ] += wi * prodρδi * ws.ξs[colnumξ,i]
             colnumξ += 1
             colnumϑ += 1
         end
@@ -217,3 +217,5 @@ function ll_ggp!(GGp, ϑ::Vector{Float64}, data::EndogProbitData, wgts=nothing)
     GGp ./= n
     return nothing
 end
+
+export ll_ggp!

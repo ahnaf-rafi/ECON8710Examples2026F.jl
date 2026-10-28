@@ -7,3 +7,5 @@ function wgts!(rng::AbstractRNG, w::Vector{Float64}, ::GaussianWeights)
     w .+= 1.0
     return w
 end
+
+export GaussianWeights

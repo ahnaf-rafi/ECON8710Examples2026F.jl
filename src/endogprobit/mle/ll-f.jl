@@ -1,21 +1,21 @@
 """
-    ll(ϑ, data::EndogProbitData, wgts=nothing)
+    ll(ϑ, ws::EndogProbitMLEWorkspace, wgts=nothing)
 
 Return the negative average loglikelihood, omitting the normal-density
-constant. Observations are columns of `data.ξs`, with rows ordered as
+constant. Observations are columns of `ws.ξs`, with rows ordered as
 `[X; Z; D; Y]` and outcomes `Y` coded as `-1` or `1`.
 
 The parameter vector is ordered as `ϑ = [β; γ; π; α; τ; ρ]`, with length
-`2data.k + data.l + 3`.
+`2ws.k + ws.l + 3`.
 
 `wgts` is either `nothing` for unit weights or a real vector with one weight
 per observation. Weighted contributions are divided by the number of
 observations, not the sum of the weights.
 """
-function ll(ϑ, data::EndogProbitData, wgts=nothing)
-    n = size(data.ξs, 2)
-    k = data.k
-    l = data.l
+function ll(ϑ, ws::EndogProbitMLEWorkspace, wgts=nothing)
+    n = size(ws.ξs, 2)
+    k = ws.k
+    l = ws.l
 
     # Iterate once through back and extract params.
     rownumϑ = (2k) + l + 1
@@ -51,14 +51,14 @@ function ll(ϑ, data::EndogProbitData, wgts=nothing)
         # Calculate X'β.
         Xβi = 0.0
         for j in 1:k
-            Xβi += data.ξs[j,i] * ϑ[rownumϑ]
+            Xβi += ws.ξs[j,i] * ϑ[rownumϑ]
             rownumϑ += 1
         end
 
         # Calculate X'γ.
         Xγi = 0.0
         for _ in 1:k
-            Xγi += data.ξs[rownumξ,i] * ϑ[rownumϑ]
+            Xγi += ws.ξs[rownumξ,i] * ϑ[rownumϑ]
             rownumξ += 1
             rownumϑ += 1
         end
@@ -66,15 +66,15 @@ function ll(ϑ, data::EndogProbitData, wgts=nothing)
         # Calculate Z'π.
         Zπi = 0.0
         for _ in 1:l
-            Zπi += data.ξs[rownumξ,i] * ϑ[rownumϑ]
+            Zπi += ws.ξs[rownumξ,i] * ϑ[rownumϑ]
             rownumξ += 1
             rownumϑ += 1
         end
 
         # Extract D and Y.
-        Di = data.ξs[rownumξ,i]
+        Di = ws.ξs[rownumξ,i]
         rownumξ += 1
-        Yi = data.ξs[rownumξ,i]
+        Yi = ws.ξs[rownumξ,i]
 
         # Calculate first stage residual
         νi = Di - Xγi - Zπi
@@ -86,3 +86,5 @@ function ll(ϑ, data::EndogProbitData, wgts=nothing)
     end
     return -llval / n
 end
+
+export ll

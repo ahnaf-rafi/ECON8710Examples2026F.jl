@@ -1,12 +1,12 @@
 function fit_mle!(
     opt :: NLopt.Opt, ϑhat :: Vector{Float64}, ϑinit :: Vector{Float64},
     ϑwork :: Vector{Float64}, mlelb :: Vector{Float64}, mleub :: Vector{Float64},
-    ρgrid :: Vector{Float64}, data :: EndogProbitData, wgts = nothing;
+    ρgrid :: Vector{Float64}, ws :: EndogProbitMLEWorkspace, wgts = nothing;
     tolf :: Float64 = 1e-12, tolx :: Float64 = 1e-12, tolg :: Float64 = 1e-12,
     maxiter :: Int = 1000, maxgrads :: Int = 100
 )
     dϑ = length(ϑinit)
-    NLopt.min_objective!(opt, (ϑ, G) -> ll_nlopt_fg!(ϑ, G, data, wgts))
+    NLopt.min_objective!(opt, (ϑ, G) -> ll_nlopt_fg!(ϑ, G, ws, wgts))
     NLopt.ftol_abs!(opt, tolf)
     NLopt.xtol_abs!(opt, tolx)
     NLopt.nlopt_set_param(opt, "tolg", tolg)

@@ -1,26 +1,30 @@
-"""
-    EndogProbitData
-
-Data container for a probit model with a single endogenous covariate.
-
-Fields:
-- `ξs::Matrix{Float64}`: observation columns, with `k + l + 2` rows.
-- `k::Int`: number of exogenous regressors.
-- `l::Int`: number of excluded instruments.
-
-`EndogProbitData(n, k, l)` allocates uninitialized storage for `n` observations.
-"""
-struct EndogProbitData
-    ξs :: Matrix{Float64}
-    k  :: Int
-    l  :: Int
+struct EndogProbitMLEWorkspace
+    k    :: Int
+    l    :: Int
+    ξs   :: Matrix{Float64}
+    H    :: Matrix{Float64} # Average Hessian; overwritten by Cholesky.
+    Hinv :: Matrix{Float64} # Inverse of average Hessian.
+    Ω    :: Matrix{Float64} # Average score outer product.
+    V    :: Matrix{Float64} # Covariance matrix of ϑhat.
+    tmp  :: Matrix{Float64} # Matrix multiplication workspace.
 end
 
-function EndogProbitData(n::Int, k::Int, l::Int)
-    return EndogProbitData(Matrix{Float64}(undef, k + l + 2, n), k, l)
+function EndogProbitMLEWorkspace(n::Int, k::Int, l::Int)
+    d = (2k) + l + 3
+
+    return EndogProbitMLEWorkspace(
+        k,
+        l,
+        Matrix{Float64}(undef, k + l + 2, n),
+        Matrix{Float64}(undef, d, d),
+        Matrix{Float64}(undef, d, d),
+        Matrix{Float64}(undef, d, d),
+        Matrix{Float64}(undef, d, d),
+        Matrix{Float64}(undef, d, d)
+    )
 end
 
-export EndogProbitData
+export EndogProbitMLEWorkspace
 
 # Abstract super-type for more DGPs for this model for future use.
 abstract type EndogProbitDGP end

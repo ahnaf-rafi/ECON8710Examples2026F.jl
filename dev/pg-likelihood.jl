@@ -60,13 +60,13 @@ dgp = EndogProbitGaussianDGP(α0, β0, π0, γ0, CU0)
 n = 500
 
 # Struct for data storage.
-data = EndogProbitData(n, k, l)
+ws = EndogProbitMLEWorkspace(n, k, l)
 
 # SET SEED! YES. EVEN FOR PILOT AND TRIAL STUFF. GET INTO THE HABIT.
 rng = Xoshiro(0)
 
 # Generate data.
-gen!(rng, data, dgp)
+gen!(rng, ws, dgp)
 
 wgts = nothing
 
@@ -94,10 +94,10 @@ opt = NLopt.Opt(:LD_LBFGS, dϑ)
 
 ρgrid = collect(range(ρlo, ρhi; length=nρgrid))
 
-fit_mle!(opt, ϑhat, ϑinit, ϑwork, mlelb, mleub, ρgrid, data, wgts)
+fit_mle!(opt, ϑhat, ϑinit, ϑwork, mlelb, mleub, ρgrid, ws, wgts)
 
 @benchmark fit_mle!(
-    $opt, $ϑhat, $ϑinit, $ϑwork, $mlelb, $mleub, $ρgrid, $data, $wgts
+    $opt, $ϑhat, $ϑinit, $ϑwork, $mlelb, $mleub, $ρgrid, $ws, $wgts
 )
 
 
@@ -106,7 +106,7 @@ evals=1
 
 # Set optimization objective
 opt = NLopt.Opt(:LD_LBFGS, dϑ)
-min_objective!(opt, (ϑ, G) -> ll_nlopt_fg!(ϑ, G, data, wgts))
+min_objective!(opt, (ϑ, G) -> ll_nlopt_fg!(ϑ, G, ws, wgts))
 
 # Set bounds
 mlelb = fill(-Inf, dϑ)
@@ -140,7 +140,7 @@ profile_status = fill(:NOT_RUN, length(ρgrid))
 
 popt = NLopt.Opt(:LD_LBFGS, dϑ)
 NLopt.min_objective!(
-    popt, (ϑ, G) -> ll_nlopt_fg!(ϑ, G, data, wgts)
+    popt, (ϑ, G) -> ll_nlopt_fg!(ϑ, G, ws, wgts)
 )
 NLopt.ftol_abs!(popt, tolf)
 NLopt.xtol_abs!(popt, tolx)
@@ -182,7 +182,7 @@ boxed_status = fill(:NOT_RUN, length(boxed_ll))
 
 bopt = NLopt.Opt(:LD_LBFGS, dϑ)
 NLopt.min_objective!(
-    bopt, (ϑ, G) -> ll_nlopt_fg!(ϑ, G, data, wgts)
+    bopt, (ϑ, G) -> ll_nlopt_fg!(ϑ, G, ws, wgts)
 )
 NLopt.ftol_abs!(bopt, tolf)
 NLopt.xtol_abs!(bopt, tolx)

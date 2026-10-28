@@ -6,6 +6,7 @@ authors = ["Ahnaf Rafi <ahnaf.al.rafi@gmail.com>"]
 [deps]
 BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
 Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
+Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
 JLD2 = "033835bb-8acc-5ee8-8aae-3f567f8a3819"
 JSOSolvers = "10dff2fc-5484-5881-a0e0-c90441020f8a"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
@@ -25,6 +26,7 @@ StatsPlots = "f3b207a7-027a-5e70-b257-86293d7955fd"
 [compat]
 BenchmarkTools = "1.8.0"
 Dates = "1.11.0"
+Distributions = "0.25.132"
 JLD2 = "0.6.7"
 JSOSolvers = "0.14.8"
 LinearAlgebra = "1.12.0"

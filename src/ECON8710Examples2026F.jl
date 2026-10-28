@@ -5,10 +5,9 @@ using Random
 using Dates
 using NLopt
 using Optim
-
+using JLD2
 using StatsFuns: normcdf, normpdf, normlogcdf
 using LogExpFunctions
-
 using Distributions  # Needed for Poisson number generation.
 
 # Useful constants.
@@ -65,10 +64,13 @@ include("endogprobit/mle/ll-g-outprod.jl")
 include("endogprobit/mle/ll-wrap-nlopt.jl")
 include("endogprobit/mle/ll-wrap-optim.jl")
 # include("endogprobit/mle/ll-wrap-jso.jl")
+include("endogprobit/mle/vcov.jl")
 
 # Two-step GMM
 include("endogprobit/twostep/base.jl")
 include("endogprobit/twostep/solver.jl")
+include("endogprobit/twostep/vcov.jl")
+include("endogprobit/twostep/alpha.jl")
 
 # Simulation setup.
 # RNG constructor for split simulations.

@@ -1,20 +1,20 @@
 """
-    ll_h!(H, ϑ, data::EndogProbitData, wgts=nothing)
+    ll_h!(H, ϑ, ws::EndogProbitMLEWorkspace, wgts=nothing)
 
 Overwrite `H` with the Hessian of [`ll`](@ref) and return `nothing`.
 Note that this is the Hessian of the negative average log-likelihood.
 Parameter vector is ordered as `ϑ = [β; γ; π; α; τ; ρ]`, where `τ = Var(ν) > 0`
 and `ρ = Corr(ν, ϵ) ∈ (-1, 1)` lies strictly between -1 and 1.
-Observations are columns of `data.ξs`, with rows ordered as `[X; Z; D; Y]`
+Observations are columns of `ws.ξs`, with rows ordered as `[X; Z; D; Y]`
 and outcomes `Y` coded as `-1` or `1`.
 
 `wgts` is either `nothing` for unit weights or a real vector with one weight
 per observation. Zero-weight observations are skipped.
 """
-function ll_h!(H, ϑ, data::EndogProbitData, wgts=nothing)
-    n = size(data.ξs, 2)
-    k = data.k
-    l = data.l
+function ll_h!(H, ϑ, ws::EndogProbitMLEWorkspace, wgts=nothing)
+    n = size(ws.ξs, 2)
+    k = ws.k
+    l = ws.l
 
     # Iterate once through back and extract params.
     rownumϑ = (2k) + l + 1
@@ -53,14 +53,14 @@ function ll_h!(H, ϑ, data::EndogProbitData, wgts=nothing)
         # Calculate X'β.
         Xβi = 0.0
         for j in 1:k
-            Xβi += data.ξs[j,i] * ϑ[rownumϑ]
+            Xβi += ws.ξs[j,i] * ϑ[rownumϑ]
             rownumϑ += 1
         end
 
         # Calculate X'γ.
         Xγi = 0.0
         for _ in 1:k
-            Xγi += data.ξs[rownumξ,i] * ϑ[rownumϑ]
+            Xγi += ws.ξs[rownumξ,i] * ϑ[rownumϑ]
             rownumξ += 1
             rownumϑ += 1
         end
@@ -68,15 +68,15 @@ function ll_h!(H, ϑ, data::EndogProbitData, wgts=nothing)
         # Calculate Z'π.
         Zπi = 0.0
         for _ in 1:l
-            Zπi += data.ξs[rownumξ,i] * ϑ[rownumϑ]
+            Zπi += ws.ξs[rownumξ,i] * ϑ[rownumϑ]
             rownumξ += 1
             rownumϑ += 1
         end
 
         # Extract D and Y.
-        Di = data.ξs[rownumξ,i]
+        Di = ws.ξs[rownumξ,i]
         rownumξ += 1
-        Yi = data.ξs[rownumξ,i]
+        Yi = ws.ξs[rownumξ,i]
 
         # Calculate first stage residual
         νi = Di - Xγi - Zπi
@@ -117,29 +117,29 @@ function ll_h!(H, ϑ, data::EndogProbitData, wgts=nothing)
             rownumϑ = colnumϑ
 
             for a in j:k
-                H[rownumϑ,colnumϑ] -= wi * curvββi * data.ξs[a,i] * data.ξs[j,i]
+                H[rownumϑ,colnumϑ] -= wi * curvββi * ws.ξs[a,i] * ws.ξs[j,i]
                 rownumϑ += 1
             end
 
             for _ in 1:k
                 H[rownumϑ,colnumϑ] -= wi * curvδβi *
-                    data.ξs[rownumξ,i] * data.ξs[j,i]
+                    ws.ξs[rownumξ,i] * ws.ξs[j,i]
                 rownumξ += 1
                 rownumϑ += 1
             end
 
             for _ in 1:l
                 H[rownumϑ,colnumϑ] -= wi * curvδβi *
-                    data.ξs[rownumξ,i] * data.ξs[j,i]
+                    ws.ξs[rownumξ,i] * ws.ξs[j,i]
                 rownumξ += 1
                 rownumϑ += 1
             end
 
-            H[rownumϑ,colnumϑ] -= wi * curvββi * Di * data.ξs[j,i]
+            H[rownumϑ,colnumϑ] -= wi * curvββi * Di * ws.ξs[j,i]
             rownumϑ += 1
-            H[rownumϑ,colnumϑ] -= wi * curvτβi * data.ξs[j,i]
+            H[rownumϑ,colnumϑ] -= wi * curvτβi * ws.ξs[j,i]
             rownumϑ += 1
-            H[rownumϑ,colnumϑ] -= wi * curvρβi * data.ξs[j,i]
+            H[rownumϑ,colnumϑ] -= wi * curvρβi * ws.ξs[j,i]
             colnumϑ += 1
         end
 
@@ -149,23 +149,23 @@ function ll_h!(H, ϑ, data::EndogProbitData, wgts=nothing)
 
             for _ in j:k
                 H[rownumϑ,colnumϑ] -= wi * curvδδi *
-                    data.ξs[rownumξ,i] * data.ξs[colnumξ,i]
+                    ws.ξs[rownumξ,i] * ws.ξs[colnumξ,i]
                 rownumξ += 1
                 rownumϑ += 1
             end
 
             for _ in 1:l
                 H[rownumϑ,colnumϑ] -= wi * curvδδi *
-                    data.ξs[rownumξ,i] * data.ξs[colnumξ,i]
+                    ws.ξs[rownumξ,i] * ws.ξs[colnumξ,i]
                 rownumξ += 1
                 rownumϑ += 1
             end
 
-            H[rownumϑ,colnumϑ] -= wi * curvδβi * Di * data.ξs[colnumξ,i]
+            H[rownumϑ,colnumϑ] -= wi * curvδβi * Di * ws.ξs[colnumξ,i]
             rownumϑ += 1
-            H[rownumϑ,colnumϑ] -= wi * curvτδi * data.ξs[colnumξ,i]
+            H[rownumϑ,colnumϑ] -= wi * curvτδi * ws.ξs[colnumξ,i]
             rownumϑ += 1
-            H[rownumϑ,colnumϑ] -= wi * curvρδi * data.ξs[colnumξ,i]
+            H[rownumϑ,colnumϑ] -= wi * curvρδi * ws.ξs[colnumξ,i]
             colnumξ += 1
             colnumϑ += 1
         end
@@ -176,16 +176,16 @@ function ll_h!(H, ϑ, data::EndogProbitData, wgts=nothing)
 
             for _ in j:l
                 H[rownumϑ,colnumϑ] -= wi * curvδδi *
-                    data.ξs[rownumξ,i] * data.ξs[colnumξ,i]
+                    ws.ξs[rownumξ,i] * ws.ξs[colnumξ,i]
                 rownumξ += 1
                 rownumϑ += 1
             end
 
-            H[rownumϑ,colnumϑ] -= wi * curvδβi * Di * data.ξs[colnumξ,i]
+            H[rownumϑ,colnumϑ] -= wi * curvδβi * Di * ws.ξs[colnumξ,i]
             rownumϑ += 1
-            H[rownumϑ,colnumϑ] -= wi * curvτδi * data.ξs[colnumξ,i]
+            H[rownumϑ,colnumϑ] -= wi * curvτδi * ws.ξs[colnumξ,i]
             rownumϑ += 1
-            H[rownumϑ,colnumϑ] -= wi * curvρδi * data.ξs[colnumξ,i]
+            H[rownumϑ,colnumϑ] -= wi * curvρδi * ws.ξs[colnumξ,i]
             colnumξ += 1
             colnumϑ += 1
         end
@@ -228,7 +228,7 @@ function ll_h!(H, ϑ, data::EndogProbitData, wgts=nothing)
 end
 
 """
-    ll_fgh!(G, H, ϑ, data::EndogProbitData, wgts=nothing)
+    ll_fgh!(G, H, ϑ, ws::EndogProbitMLEWorkspace, wgts=nothing)
 
 Return [`ll`](@ref) and overwrite `G` and `H` with its gradient and
 Hessian in a single pass through the observations.
@@ -236,16 +236,16 @@ Note that this returns the negative average log-likelihood, and the gradient and
 Hessian thereof.
 Parameter vector is ordered as `ϑ = [β; γ; π; α; τ; ρ]`, where `τ = Var(ν) > 0`
 and `ρ = Corr(ν, ϵ) ∈ (-1, 1)`.
-Observations are columns of `data.ξs`, with rows ordered as `[X; Z; D; Y]`
+Observations are columns of `ws.ξs`, with rows ordered as `[X; Z; D; Y]`
 and outcomes `Y` coded as `-1` or `1`.
 
 `wgts` is either `nothing` for unit weights or a real vector with one weight
 per observation. Zero-weight observations are skipped.
 """
-function ll_fgh!(G, H, ϑ, data::EndogProbitData, wgts=nothing)
-    n = size(data.ξs, 2)
-    k = data.k
-    l = data.l
+function ll_fgh!(G, H, ϑ, ws::EndogProbitMLEWorkspace, wgts=nothing)
+    n = size(ws.ξs, 2)
+    k = ws.k
+    l = ws.l
 
     # Iterate once through back and extract params.
     rownumϑ = (2k) + l + 1
@@ -288,14 +288,14 @@ function ll_fgh!(G, H, ϑ, data::EndogProbitData, wgts=nothing)
         # Calculate X'β.
         Xβi = 0.0
         for j in 1:k
-            Xβi += data.ξs[j,i] * ϑ[rownumϑ]
+            Xβi += ws.ξs[j,i] * ϑ[rownumϑ]
             rownumϑ += 1
         end
 
         # Calculate X'γ.
         Xγi = 0.0
         for _ in 1:k
-            Xγi += data.ξs[rownumξ,i] * ϑ[rownumϑ]
+            Xγi += ws.ξs[rownumξ,i] * ϑ[rownumϑ]
             rownumξ += 1
             rownumϑ += 1
         end
@@ -303,15 +303,15 @@ function ll_fgh!(G, H, ϑ, data::EndogProbitData, wgts=nothing)
         # Calculate Z'π.
         Zπi = 0.0
         for _ in 1:l
-            Zπi += data.ξs[rownumξ,i] * ϑ[rownumϑ]
+            Zπi += ws.ξs[rownumξ,i] * ϑ[rownumϑ]
             rownumξ += 1
             rownumϑ += 1
         end
 
         # Extract D and Y.
-        Di = data.ξs[rownumξ,i]
+        Di = ws.ξs[rownumξ,i]
         rownumξ += 1
-        Yi = data.ξs[rownumξ,i]
+        Yi = ws.ξs[rownumξ,i]
 
         # Calculate first stage residual
         νi = Di - Xγi - Zπi
@@ -334,18 +334,18 @@ function ll_fgh!(G, H, ϑ, data::EndogProbitData, wgts=nothing)
         rownumξ = 1
         rownumϑ = 1
         for j in 1:k
-            G[rownumϑ] -= wi * scoreβi * data.ξs[j,i]
+            G[rownumϑ] -= wi * scoreβi * ws.ξs[j,i]
             rownumϑ += 1
         end
 
         for _ in 1:k
-            G[rownumϑ] -= wi * scoreδi * data.ξs[rownumξ,i]
+            G[rownumϑ] -= wi * scoreδi * ws.ξs[rownumξ,i]
             rownumξ += 1
             rownumϑ += 1
         end
 
         for _ in 1:l
-            G[rownumϑ] -= wi * scoreδi * data.ξs[rownumξ,i]
+            G[rownumϑ] -= wi * scoreδi * ws.ξs[rownumξ,i]
             rownumξ += 1
             rownumϑ += 1
         end
@@ -390,29 +390,29 @@ function ll_fgh!(G, H, ϑ, data::EndogProbitData, wgts=nothing)
             rownumϑ = colnumϑ
 
             for a in j:k
-                H[rownumϑ,colnumϑ] -= wi * curvββi * data.ξs[a,i] * data.ξs[j,i]
+                H[rownumϑ,colnumϑ] -= wi * curvββi * ws.ξs[a,i] * ws.ξs[j,i]
                 rownumϑ += 1
             end
 
             for _ in 1:k
                 H[rownumϑ,colnumϑ] -= wi * curvδβi *
-                    data.ξs[rownumξ,i] * data.ξs[j,i]
+                    ws.ξs[rownumξ,i] * ws.ξs[j,i]
                 rownumξ += 1
                 rownumϑ += 1
             end
 
             for _ in 1:l
                 H[rownumϑ,colnumϑ] -= wi * curvδβi *
-                    data.ξs[rownumξ,i] * data.ξs[j,i]
+                    ws.ξs[rownumξ,i] * ws.ξs[j,i]
                 rownumξ += 1
                 rownumϑ += 1
             end
 
-            H[rownumϑ,colnumϑ] -= wi * curvββi * Di * data.ξs[j,i]
+            H[rownumϑ,colnumϑ] -= wi * curvββi * Di * ws.ξs[j,i]
             rownumϑ += 1
-            H[rownumϑ,colnumϑ] -= wi * curvτβi * data.ξs[j,i]
+            H[rownumϑ,colnumϑ] -= wi * curvτβi * ws.ξs[j,i]
             rownumϑ += 1
-            H[rownumϑ,colnumϑ] -= wi * curvρβi * data.ξs[j,i]
+            H[rownumϑ,colnumϑ] -= wi * curvρβi * ws.ξs[j,i]
             colnumϑ += 1
         end
 
@@ -422,23 +422,23 @@ function ll_fgh!(G, H, ϑ, data::EndogProbitData, wgts=nothing)
 
             for _ in j:k
                 H[rownumϑ,colnumϑ] -= wi * curvδδi *
-                    data.ξs[rownumξ,i] * data.ξs[colnumξ,i]
+                    ws.ξs[rownumξ,i] * ws.ξs[colnumξ,i]
                 rownumξ += 1
                 rownumϑ += 1
             end
 
             for _ in 1:l
                 H[rownumϑ,colnumϑ] -= wi * curvδδi *
-                    data.ξs[rownumξ,i] * data.ξs[colnumξ,i]
+                    ws.ξs[rownumξ,i] * ws.ξs[colnumξ,i]
                 rownumξ += 1
                 rownumϑ += 1
             end
 
-            H[rownumϑ,colnumϑ] -= wi * curvδβi * Di * data.ξs[colnumξ,i]
+            H[rownumϑ,colnumϑ] -= wi * curvδβi * Di * ws.ξs[colnumξ,i]
             rownumϑ += 1
-            H[rownumϑ,colnumϑ] -= wi * curvτδi * data.ξs[colnumξ,i]
+            H[rownumϑ,colnumϑ] -= wi * curvτδi * ws.ξs[colnumξ,i]
             rownumϑ += 1
-            H[rownumϑ,colnumϑ] -= wi * curvρδi * data.ξs[colnumξ,i]
+            H[rownumϑ,colnumϑ] -= wi * curvρδi * ws.ξs[colnumξ,i]
             colnumξ += 1
             colnumϑ += 1
         end
@@ -449,16 +449,16 @@ function ll_fgh!(G, H, ϑ, data::EndogProbitData, wgts=nothing)
 
             for _ in j:l
                 H[rownumϑ,colnumϑ] -= wi * curvδδi *
-                    data.ξs[rownumξ,i] * data.ξs[colnumξ,i]
+                    ws.ξs[rownumξ,i] * ws.ξs[colnumξ,i]
                 rownumξ += 1
                 rownumϑ += 1
             end
 
-            H[rownumϑ,colnumϑ] -= wi * curvδβi * Di * data.ξs[colnumξ,i]
+            H[rownumϑ,colnumϑ] -= wi * curvδβi * Di * ws.ξs[colnumξ,i]
             rownumϑ += 1
-            H[rownumϑ,colnumϑ] -= wi * curvτδi * data.ξs[colnumξ,i]
+            H[rownumϑ,colnumϑ] -= wi * curvτδi * ws.ξs[colnumξ,i]
             rownumϑ += 1
-            H[rownumϑ,colnumϑ] -= wi * curvρδi * data.ξs[colnumξ,i]
+            H[rownumϑ,colnumϑ] -= wi * curvρδi * ws.ξs[colnumξ,i]
             colnumξ += 1
             colnumϑ += 1
         end
@@ -502,7 +502,7 @@ function ll_fgh!(G, H, ϑ, data::EndogProbitData, wgts=nothing)
 end
 
 """
-    ll_gh!(G, H, ϑ, data::EndogProbitData, wgts=nothing)
+    ll_gh!(G, H, ϑ, ws::EndogProbitMLEWorkspace, wgts=nothing)
 
 Overwrite `G` and `H` with the gradient and Hessian of [`ll`](@ref)
 in a single pass through the observations and return `nothing`.
@@ -511,16 +511,16 @@ Hessian thereof.
 
 Parameter vector is ordered as `ϑ = [β; γ; π; α; τ; ρ]`, where `τ = Var(ν) > 0`
 and `ρ = Corr(ν, ϵ) ∈ (-1, 1)`.
-Observations are columns of `data.ξs`, with rows ordered as `[X; Z; D; Y]`
+Observations are columns of `ws.ξs`, with rows ordered as `[X; Z; D; Y]`
 and outcomes `Y` coded as `-1` or `1`.
 
 `wgts` is either `nothing` for unit weights or a real vector with one weight
 per observation. Zero-weight observations are skipped.
 """
-function ll_gh!(G, H, ϑ, data::EndogProbitData, wgts=nothing)
-    n = size(data.ξs, 2)
-    k = data.k
-    l = data.l
+function ll_gh!(G, H, ϑ, ws::EndogProbitMLEWorkspace, wgts=nothing)
+    n = size(ws.ξs, 2)
+    k = ws.k
+    l = ws.l
 
     # Iterate once through back and extract params.
     rownumϑ = (2k) + l + 1
@@ -561,14 +561,14 @@ function ll_gh!(G, H, ϑ, data::EndogProbitData, wgts=nothing)
         # Calculate X'β.
         Xβi = 0.0
         for j in 1:k
-            Xβi += data.ξs[j,i] * ϑ[rownumϑ]
+            Xβi += ws.ξs[j,i] * ϑ[rownumϑ]
             rownumϑ += 1
         end
 
         # Calculate X'γ.
         Xγi = 0.0
         for _ in 1:k
-            Xγi += data.ξs[rownumξ,i] * ϑ[rownumϑ]
+            Xγi += ws.ξs[rownumξ,i] * ϑ[rownumϑ]
             rownumξ += 1
             rownumϑ += 1
         end
@@ -576,15 +576,15 @@ function ll_gh!(G, H, ϑ, data::EndogProbitData, wgts=nothing)
         # Calculate Z'π.
         Zπi = 0.0
         for _ in 1:l
-            Zπi += data.ξs[rownumξ,i] * ϑ[rownumϑ]
+            Zπi += ws.ξs[rownumξ,i] * ϑ[rownumϑ]
             rownumξ += 1
             rownumϑ += 1
         end
 
         # Extract D and Y.
-        Di = data.ξs[rownumξ,i]
+        Di = ws.ξs[rownumξ,i]
         rownumξ += 1
-        Yi = data.ξs[rownumξ,i]
+        Yi = ws.ξs[rownumξ,i]
 
         # Calculate first stage residual
         νi = Di - Xγi - Zπi
@@ -605,18 +605,18 @@ function ll_gh!(G, H, ϑ, data::EndogProbitData, wgts=nothing)
         rownumξ = 1
         rownumϑ = 1
         for j in 1:k
-            G[rownumϑ] -= wi * scoreβi * data.ξs[j,i]
+            G[rownumϑ] -= wi * scoreβi * ws.ξs[j,i]
             rownumϑ += 1
         end
 
         for _ in 1:k
-            G[rownumϑ] -= wi * scoreδi * data.ξs[rownumξ,i]
+            G[rownumϑ] -= wi * scoreδi * ws.ξs[rownumξ,i]
             rownumξ += 1
             rownumϑ += 1
         end
 
         for _ in 1:l
-            G[rownumϑ] -= wi * scoreδi * data.ξs[rownumξ,i]
+            G[rownumϑ] -= wi * scoreδi * ws.ξs[rownumξ,i]
             rownumξ += 1
             rownumϑ += 1
         end
@@ -661,29 +661,29 @@ function ll_gh!(G, H, ϑ, data::EndogProbitData, wgts=nothing)
             rownumϑ = colnumϑ
 
             for a in j:k
-                H[rownumϑ,colnumϑ] -= wi * curvββi * data.ξs[a,i] * data.ξs[j,i]
+                H[rownumϑ,colnumϑ] -= wi * curvββi * ws.ξs[a,i] * ws.ξs[j,i]
                 rownumϑ += 1
             end
 
             for _ in 1:k
                 H[rownumϑ,colnumϑ] -= wi * curvδβi *
-                    data.ξs[rownumξ,i] * data.ξs[j,i]
+                    ws.ξs[rownumξ,i] * ws.ξs[j,i]
                 rownumξ += 1
                 rownumϑ += 1
             end
 
             for _ in 1:l
                 H[rownumϑ,colnumϑ] -= wi * curvδβi *
-                    data.ξs[rownumξ,i] * data.ξs[j,i]
+                    ws.ξs[rownumξ,i] * ws.ξs[j,i]
                 rownumξ += 1
                 rownumϑ += 1
             end
 
-            H[rownumϑ,colnumϑ] -= wi * curvββi * Di * data.ξs[j,i]
+            H[rownumϑ,colnumϑ] -= wi * curvββi * Di * ws.ξs[j,i]
             rownumϑ += 1
-            H[rownumϑ,colnumϑ] -= wi * curvτβi * data.ξs[j,i]
+            H[rownumϑ,colnumϑ] -= wi * curvτβi * ws.ξs[j,i]
             rownumϑ += 1
-            H[rownumϑ,colnumϑ] -= wi * curvρβi * data.ξs[j,i]
+            H[rownumϑ,colnumϑ] -= wi * curvρβi * ws.ξs[j,i]
             colnumϑ += 1
         end
 
@@ -693,23 +693,23 @@ function ll_gh!(G, H, ϑ, data::EndogProbitData, wgts=nothing)
 
             for _ in j:k
                 H[rownumϑ,colnumϑ] -= wi * curvδδi *
-                    data.ξs[rownumξ,i] * data.ξs[colnumξ,i]
+                    ws.ξs[rownumξ,i] * ws.ξs[colnumξ,i]
                 rownumξ += 1
                 rownumϑ += 1
             end
 
             for _ in 1:l
                 H[rownumϑ,colnumϑ] -= wi * curvδδi *
-                    data.ξs[rownumξ,i] * data.ξs[colnumξ,i]
+                    ws.ξs[rownumξ,i] * ws.ξs[colnumξ,i]
                 rownumξ += 1
                 rownumϑ += 1
             end
 
-            H[rownumϑ,colnumϑ] -= wi * curvδβi * Di * data.ξs[colnumξ,i]
+            H[rownumϑ,colnumϑ] -= wi * curvδβi * Di * ws.ξs[colnumξ,i]
             rownumϑ += 1
-            H[rownumϑ,colnumϑ] -= wi * curvτδi * data.ξs[colnumξ,i]
+            H[rownumϑ,colnumϑ] -= wi * curvτδi * ws.ξs[colnumξ,i]
             rownumϑ += 1
-            H[rownumϑ,colnumϑ] -= wi * curvρδi * data.ξs[colnumξ,i]
+            H[rownumϑ,colnumϑ] -= wi * curvρδi * ws.ξs[colnumξ,i]
             colnumξ += 1
             colnumϑ += 1
         end
@@ -720,16 +720,16 @@ function ll_gh!(G, H, ϑ, data::EndogProbitData, wgts=nothing)
 
             for _ in j:l
                 H[rownumϑ,colnumϑ] -= wi * curvδδi *
-                    data.ξs[rownumξ,i] * data.ξs[colnumξ,i]
+                    ws.ξs[rownumξ,i] * ws.ξs[colnumξ,i]
                 rownumξ += 1
                 rownumϑ += 1
             end
 
-            H[rownumϑ,colnumϑ] -= wi * curvδβi * Di * data.ξs[colnumξ,i]
+            H[rownumϑ,colnumϑ] -= wi * curvδβi * Di * ws.ξs[colnumξ,i]
             rownumϑ += 1
-            H[rownumϑ,colnumϑ] -= wi * curvτδi * data.ξs[colnumξ,i]
+            H[rownumϑ,colnumϑ] -= wi * curvτδi * ws.ξs[colnumξ,i]
             rownumϑ += 1
-            H[rownumϑ,colnumϑ] -= wi * curvρδi * data.ξs[colnumξ,i]
+            H[rownumϑ,colnumϑ] -= wi * curvρδi * ws.ξs[colnumξ,i]
             colnumξ += 1
             colnumϑ += 1
         end
@@ -771,3 +771,5 @@ function ll_gh!(G, H, ϑ, data::EndogProbitData, wgts=nothing)
     H ./= n
     return nothing
 end
+
+export ll_h!, ll_gh!, ll_fgh!

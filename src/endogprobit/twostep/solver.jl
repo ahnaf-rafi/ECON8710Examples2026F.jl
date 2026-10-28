@@ -1,5 +1,5 @@
 function fit_gmm!(
-    optprb::NLopt.Opt, θinit::Vector{Float64}, ws::TwoStepEndogProbitWorkspace, wgts
+    optprb::NLopt.Opt, θinit::Vector{Float64}, ws::EndogProbit2StepWorkspace, wgts
 )
     ols!(ws.δhat, ws.SS, ws.ξols, wgts)
     residualize!(ws)

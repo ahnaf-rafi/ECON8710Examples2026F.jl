@@ -34,3 +34,5 @@ function wgts!(
     end
     return w
 end
+
+export MultinomialWeights

@@ -21,6 +21,8 @@ function mixunifm1v1!(
     return nothing
 end
 
-export munifm1v1, munifm1v1_rand, munifm1v1_rand!
+export munifm1v1, mixunifm1v1, mixunifm1v1!
 
 @inline wgts!(rng::AbstractRNG, w::Vector{Float64}, ::MixtureUniformWeights) = mixunifm1v1!(rng, w)
+
+export MixtureUniformWeights
