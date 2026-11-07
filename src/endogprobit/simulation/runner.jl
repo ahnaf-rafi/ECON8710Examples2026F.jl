@@ -82,6 +82,7 @@ function run_sims(
     pad_n = lpad(n, n_pad, '0')
     pad_R_start = lpad(r_start, r_pad, '0')
     log_file = joinpath(logdir, "n$(pad_n)_r$(pad_R_start).txt")
+    # File naming functor.
     namer = SimJLD2Namer(joinpath(outdir, "n$(pad_n)_"), r_pad)
 
     # Start logging.

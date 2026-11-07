@@ -1,0 +1,6 @@
+Missing files and invalid estimates/intervals are listed below.
+Missing: n=1000, r=188
+Missing: n=1000, r=429
+n=1000: expected=500, saved=498, missing=2
+n=2000: expected=500, saved=500, missing=0
+n=4000: expected=500, saved=500, missing=0

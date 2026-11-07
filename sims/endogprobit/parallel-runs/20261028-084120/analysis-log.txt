@@ -1,0 +1,1 @@
+Alpha analysis: /home/vzm2mw/projects/ECON8710Examples2026F.jl/sims/endogprobit/parallel-runs/20261028-084120/analysis

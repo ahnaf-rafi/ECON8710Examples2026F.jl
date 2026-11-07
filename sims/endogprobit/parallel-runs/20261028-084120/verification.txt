@@ -1,0 +1,6 @@
+Test Summary:           |  Pass  Total  Time
+R500 B500 saved outputs | 40446  40446  0.3s
+SUMMARY n=1000 saved=498 mean_alpha_mle=0.9751021726718181 mean_se_mle=0.075877642145694 mean_alpha_gmm=0.9764310174966028 mean_se_gmm=0.07422493066575105
+SUMMARY n=2000 saved=500 mean_alpha_mle=0.9888270412104839 mean_se_mle=0.0455232634764993 mean_alpha_gmm=0.9890768474234447 mean_se_gmm=0.04529040796844991
+SUMMARY n=4000 saved=500 mean_alpha_mle=0.9964598105356866 mean_se_mle=0.02873745858868554 mean_alpha_gmm=0.9964992266228749 mean_se_gmm=0.028723411711212128
+MISSING [(1000, 188), (1000, 429)]

@@ -1,0 +1,22 @@
+Alpha: equal-tailed 95.0% confidence interval coverage
+Each cell is percent coverage (usable N). Excluded count = 500 - N.
+Coverage is conditional on an available, numerically valid interval.
+All 500 bootstrap draws must be valid; no draws are dropped.
+BM = multinomial weights; BE = exponential weights.
+Basic uses centered bootstrap differences (not percentile intervals).
+Studentized uses (alpha_b-alpha)/SE_b and the original SE.
+Quantiles use Julia's default linear interpolation.
+Saved files do not contain optimizer statuses or gradient norms.
+These numerical checks do not establish convergence.
+
+------------------------------------------------------------------------------------------------------------
+     n  Estimator          Gaussian          Basic BM          Basic BE        Student BM        Student BE
+------------------------------------------------------------------------------------------------------------
+  1000  MLE             97.59 (498)       97.79 (498)       98.19 (498)       94.98 (498)       94.98 (498)
+  1000  Two-step        97.79 (498)       97.39 (498)       97.99 (498)       94.98 (498)       95.38 (498)
+  2000  MLE             96.40 (500)       96.20 (500)       97.00 (500)       92.60 (500)       92.80 (500)
+  2000  Two-step        96.20 (500)       96.20 (500)       96.80 (500)       93.20 (500)       92.00 (500)
+  4000  MLE             98.40 (500)       98.00 (500)       98.20 (500)       94.60 (500)       94.20 (500)
+  4000  Two-step        98.20 (500)       98.20 (500)       98.40 (500)       94.80 (500)       94.60 (500)
+------------------------------------------------------------------------------------------------------------
+See alpha-checks.txt for individual missing/invalid results.

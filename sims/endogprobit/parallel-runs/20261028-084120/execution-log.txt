@@ -1,0 +1,168 @@
+Precompiling packages...
+   1728.5 ms  ✓ ECON8710Examples2026F
+  1 dependency successfully precompiled in 2 seconds. 290 already precompiled.
+  4 dependencies precompiled but different versions are currently loaded (Dates, Distributed, Printf and Serialization). Restart julia to access the new versions. Otherwise, 190 dependents of these packages may trigger further precompilation to work with the unexpected versions.
+ERROR: LoadError: Some batches failed; see batch logs.
+Stacktrace:
+ [1] error(s::String)
+   @ Base ./error.jl:44
+ [2] top-level scope
+   @ ~/projects/ECON8710Examples2026F.jl/sims/endogprobit/run-parallel.jl:211
+ [3] include(mod::Module, _path::String)
+   @ Base ./Base.jl:306
+ [4] exec_options(opts::Base.JLOptions)
+   @ Base ./client.jl:317
+ [5] _start()
+   @ Base ./client.jl:550
+in expression starting at /home/vzm2mw/projects/ECON8710Examples2026F.jl/sims/endogprobit/run-parallel.jl:122
+      From worker 20:	FAILED: n=1000, r=181:190, 14.666 s.
+      From worker 5:	OK: n=1000, r=31:40, 15.961 s.
+      From worker 8:	OK: n=1000, r=61:70, 16.209 s.
+      From worker 7:	OK: n=1000, r=51:60, 16.962 s.
+      From worker 9:	OK: n=1000, r=71:80, 17.044 s.
+      From worker 14:	OK: n=1000, r=121:130, 17.927 s.
+      From worker 2:	OK: n=1000, r=1:10, 18.961 s.
+      From worker 10:	OK: n=1000, r=81:90, 18.752 s.
+      From worker 19:	OK: n=1000, r=171:180, 17.888 s.
+      From worker 6:	OK: n=1000, r=41:50, 19.499 s.
+      From worker 13:	OK: n=1000, r=111:120, 18.25 s.
+      From worker 11:	OK: n=1000, r=91:100, 18.991 s.
+      From worker 3:	OK: n=1000, r=11:20, 18.63 s.
+      From worker 4:	OK: n=1000, r=21:30, 19.075 s.
+      From worker 15:	OK: n=1000, r=131:140, 19.261 s.
+      From worker 16:	OK: n=1000, r=141:150, 19.396 s.
+      From worker 17:	OK: n=1000, r=151:160, 20.4 s.
+      From worker 12:	OK: n=1000, r=101:110, 21.773 s.
+      From worker 18:	OK: n=1000, r=161:170, 22.023 s.
+      From worker 8:	OK: n=1000, r=211:220, 18.322 s.
+      From worker 20:	OK: n=1000, r=191:200, 19.23 s.
+      From worker 5:	OK: n=1000, r=201:210, 20.174 s.
+      From worker 14:	OK: n=1000, r=241:250, 18.528 s.
+      From worker 3:	OK: n=1000, r=311:320, 17.773 s.
+      From worker 11:	OK: n=1000, r=301:310, 18.229 s.
+      From worker 6:	OK: n=1000, r=281:290, 19.157 s.
+      From worker 7:	OK: n=1000, r=221:230, 21.734 s.
+      From worker 10:	OK: n=1000, r=261:270, 19.802 s.
+      From worker 19:	OK: n=1000, r=271:280, 19.809 s.
+      From worker 9:	OK: n=1000, r=231:240, 20.89 s.
+      From worker 4:	OK: n=1000, r=321:330, 18.894 s.
+      From worker 2:	OK: n=1000, r=251:260, 20.641 s.
+      From worker 15:	OK: n=1000, r=331:340, 19.233 s.
+      From worker 13:	OK: n=1000, r=291:300, 20.777 s.
+      From worker 16:	OK: n=1000, r=341:350, 21.058 s.
+      From worker 17:	OK: n=1000, r=351:360, 20.921 s.
+      From worker 18:	OK: n=1000, r=371:380, 19.342 s.
+      From worker 12:	OK: n=1000, r=361:370, 20.563 s.
+      From worker 20:	OK: n=1000, r=391:400, 19.951 s.
+      From worker 5:	OK: n=1000, r=401:410, 19.333 s.
+      From worker 8:	OK: n=1000, r=381:390, 21.02 s.
+      From worker 3:	FAILED: n=1000, r=421:430, 18.174 s.
+      From worker 14:	OK: n=1000, r=411:420, 19.074 s.
+      From worker 11:	OK: n=1000, r=431:440, 18.988 s.
+      From worker 6:	OK: n=1000, r=441:450, 19.752 s.
+      From worker 7:	OK: n=1000, r=451:460, 20.118 s.
+      From worker 19:	OK: n=1000, r=471:480, 20.454 s.
+      From worker 9:	OK: n=1000, r=481:490, 20.627 s.
+      From worker 10:	OK: n=1000, r=461:470, 21.805 s.
+      From worker 4:	OK: n=1000, r=491:500, 21.524 s.
+      From worker 15:	OK: n=2000, r=11:20, 38.465 s.
+      From worker 2:	OK: n=2000, r=1:10, 40.708 s.
+      From worker 13:	OK: n=2000, r=21:30, 40.311 s.
+      From worker 16:	OK: n=2000, r=31:40, 38.893 s.
+      From worker 17:	OK: n=2000, r=41:50, 38.224 s.
+      From worker 12:	OK: n=2000, r=61:70, 39.692 s.
+      From worker 18:	OK: n=2000, r=51:60, 42.295 s.
+      From worker 5:	OK: n=2000, r=81:90, 39.727 s.
+      From worker 14:	OK: n=2000, r=111:120, 40.857 s.
+      From worker 8:	OK: n=2000, r=91:100, 42.092 s.
+      From worker 20:	OK: n=2000, r=71:80, 43.487 s.
+      From worker 3:	OK: n=2000, r=101:110, 42.263 s.
+      From worker 6:	OK: n=2000, r=131:140, 40.298 s.
+      From worker 7:	OK: n=2000, r=141:150, 41.013 s.
+      From worker 11:	OK: n=2000, r=121:130, 44.057 s.
+      From worker 19:	OK: n=2000, r=151:160, 41.808 s.
+      From worker 10:	OK: n=2000, r=171:180, 42.443 s.
+      From worker 9:	OK: n=2000, r=161:170, 43.738 s.
+      From worker 4:	OK: n=2000, r=181:190, 43.319 s.
+      From worker 17:	OK: n=2000, r=231:240, 43.172 s.
+      From worker 2:	OK: n=2000, r=201:210, 45.239 s.
+      From worker 15:	OK: n=2000, r=191:200, 47.218 s.
+      From worker 13:	OK: n=2000, r=211:220, 45.385 s.
+      From worker 12:	OK: n=2000, r=241:250, 44.516 s.
+      From worker 16:	OK: n=2000, r=221:230, 48.191 s.
+      From worker 18:	OK: n=2000, r=251:260, 47.057 s.
+      From worker 14:	OK: n=2000, r=271:280, 40.688 s.
+      From worker 20:	OK: n=2000, r=291:300, 43.352 s.
+      From worker 8:	OK: n=2000, r=281:290, 44.66 s.
+      From worker 5:	OK: n=2000, r=261:270, 47.242 s.
+      From worker 3:	OK: n=2000, r=301:310, 44.99 s.
+      From worker 6:	OK: n=2000, r=311:320, 45.137 s.
+      From worker 19:	OK: n=2000, r=341:350, 44.012 s.
+      From worker 11:	OK: n=2000, r=331:340, 44.382 s.
+      From worker 7:	OK: n=2000, r=321:330, 46.172 s.
+      From worker 10:	OK: n=2000, r=351:360, 45.625 s.
+      From worker 9:	OK: n=2000, r=361:370, 46.233 s.
+      From worker 4:	OK: n=2000, r=371:380, 47.944 s.
+      From worker 15:	OK: n=2000, r=401:410, 44.285 s.
+      From worker 13:	OK: n=2000, r=411:420, 44.553 s.
+      From worker 2:	OK: n=2000, r=391:400, 45.737 s.
+      From worker 17:	OK: n=2000, r=381:390, 47.264 s.
+      From worker 12:	OK: n=2000, r=421:430, 45.735 s.
+      From worker 16:	OK: n=2000, r=431:440, 44.649 s.
+      From worker 18:	OK: n=2000, r=441:450, 42.293 s.
+      From worker 14:	OK: n=2000, r=451:460, 46.161 s.
+      From worker 8:	OK: n=2000, r=471:480, 44.052 s.
+      From worker 3:	OK: n=2000, r=491:500, 44.692 s.
+      From worker 20:	OK: n=2000, r=461:470, 47.211 s.
+      From worker 5:	OK: n=2000, r=481:490, 47.702 s.
+      From worker 6:	OK: n=4000, r=1:10, 88.674 s.
+      From worker 11:	OK: n=4000, r=21:30, 87.282 s.
+      From worker 7:	OK: n=4000, r=31:40, 89.156 s.
+      From worker 19:	OK: n=4000, r=11:20, 90.297 s.
+      From worker 9:	OK: n=4000, r=51:60, 85.92 s.
+      From worker 10:	OK: n=4000, r=41:50, 90.494 s.
+      From worker 4:	OK: n=4000, r=61:70, 91.516 s.
+      From worker 2:	OK: n=4000, r=91:100, 85.107 s.
+      From worker 13:	OK: n=4000, r=81:90, 88.396 s.
+      From worker 17:	OK: n=4000, r=101:110, 89.61 s.
+      From worker 16:	OK: n=4000, r=121:130, 88.304 s.
+      From worker 12:	OK: n=4000, r=111:120, 91.181 s.
+      From worker 15:	OK: n=4000, r=71:80, 94.635 s.
+      From worker 18:	OK: n=4000, r=131:140, 94.357 s.
+      From worker 14:	OK: n=4000, r=141:150, 87.616 s.
+      From worker 3:	OK: n=4000, r=161:170, 86.723 s.
+      From worker 20:	OK: n=4000, r=171:180, 89.294 s.
+      From worker 8:	OK: n=4000, r=151:160, 92.656 s.
+      From worker 5:	OK: n=4000, r=181:190, 94.167 s.
+      From worker 7:	OK: n=4000, r=211:220, 88.472 s.
+      From worker 11:	OK: n=4000, r=201:210, 90.928 s.
+      From worker 6:	OK: n=4000, r=191:200, 92.029 s.
+      From worker 19:	OK: n=4000, r=221:230, 89.012 s.
+      From worker 10:	OK: n=4000, r=241:250, 89.95 s.
+      From worker 9:	OK: n=4000, r=231:240, 97.178 s.
+      From worker 4:	OK: n=4000, r=251:260, 90.048 s.
+      From worker 2:	OK: n=4000, r=261:270, 90.222 s.
+      From worker 13:	OK: n=4000, r=271:280, 90.79 s.
+      From worker 17:	OK: n=4000, r=281:290, 90.629 s.
+      From worker 15:	OK: n=4000, r=311:320, 90.327 s.
+      From worker 16:	OK: n=4000, r=291:300, 93.103 s.
+      From worker 12:	OK: n=4000, r=301:310, 92.198 s.
+      From worker 18:	OK: n=4000, r=321:330, 88.859 s.
+      From worker 14:	OK: n=4000, r=331:340, 93.631 s.
+      From worker 8:	OK: n=4000, r=361:370, 87.561 s.
+      From worker 20:	OK: n=4000, r=351:360, 88.919 s.
+      From worker 3:	OK: n=4000, r=341:350, 93.6 s.
+      From worker 5:	OK: n=4000, r=371:380, 89.61 s.
+      From worker 11:	OK: n=4000, r=391:400, 78.3 s.
+      From worker 19:	OK: n=4000, r=411:420, 81.088 s.
+      From worker 6:	OK: n=4000, r=401:410, 81.918 s.
+      From worker 7:	OK: n=4000, r=381:390, 83.282 s.
+      From worker 10:	OK: n=4000, r=421:430, 81.979 s.
+      From worker 4:	OK: n=4000, r=441:450, 77.573 s.
+      From worker 9:	OK: n=4000, r=431:440, 78.385 s.
+      From worker 2:	OK: n=4000, r=451:460, 74.634 s.
+      From worker 13:	OK: n=4000, r=461:470, 72.803 s.
+      From worker 17:	OK: n=4000, r=471:480, 72.44 s.
+      From worker 15:	OK: n=4000, r=481:490, 69.52 s.
+      From worker 16:	OK: n=4000, r=491:500, 69.615 s.
+Outputs: /home/vzm2mw/projects/ECON8710Examples2026F.jl/sims/endogprobit/parallel-runs/20261028-084120
